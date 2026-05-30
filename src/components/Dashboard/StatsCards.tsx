@@ -45,7 +45,7 @@ export function StatsCards() {
       {stats.map((stat) => (
         <div 
           key={stat.name} 
-          className="uiverse-card bg-gradient-to-br from-blue-600 to-blue-700 h-[240px] rounded-[40px] shadow-xl border border-white/20 flex flex-col items-center justify-center text-center p-8 group overflow-hidden"
+          className="uiverse-card bg-gradient-to-br from-blue-600 to-blue-700 min-h-[240px] h-auto rounded-[40px] shadow-xl border border-white/20 flex flex-col items-center justify-center text-center p-8 group overflow-hidden"
         >
           {/* Glass Layer */}
           <div className="uiverse-glass !opacity-20"></div>

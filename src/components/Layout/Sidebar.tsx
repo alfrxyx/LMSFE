@@ -68,7 +68,7 @@ export function Sidebar() {
   const menuItems = getMenuItems();
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-100 flex flex-col h-full shadow-sm font-['Roboto']">
+    <aside className="hidden lg:flex fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-100 flex-col h-full shadow-sm font-['Roboto']">
       {/* Logo Section */}
       <div className="p-8 flex items-center gap-3">
         <div className="h-10 w-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-blue-200">

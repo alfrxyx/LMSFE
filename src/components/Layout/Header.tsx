@@ -2,14 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
  Bell, X, CheckCircle, Info, AlertCircle,
- Trash2, Search, BookOpen, Play, Calendar, User
+ Trash2, Search, BookOpen, Play, Calendar, User, Menu
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useApp } from '../../contexts/AppContext';
 import api from '../../api/axios';
 import { toast } from 'sonner';
 
-export function Header() {
+export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
  const { user } = useAuth();
  const { courses } = useApp();
  const navigate = useNavigate();
@@ -71,8 +71,16 @@ export function Header() {
  return (
  <div className="sticky top-0 z-40 w-full p-4 md:p-6 transition-all font-['Roboto']">
    <header className="mx-auto bg-white/70 backdrop-blur-md border border-white/40 shadow-xl shadow-blue-900/5 rounded-[1.5rem] h-16 md:h-20 flex items-center px-6 md:px-10 transition-all">
-     <div className="flex justify-between items-center w-full gap-8">
+     <div className="flex justify-between items-center w-full gap-4 md:gap-8">
        
+       {/* Hamburger Menu (Mobile Only) */}
+       <button 
+         onClick={onMenuClick}
+         className="lg:hidden p-2.5 bg-gray-50 text-gray-500 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all shrink-0"
+       >
+         <Menu size={20} />
+       </button>
+
        {/* Search Bar - Matching Header.png Style */}
        <div className="flex-1 max-w-xl relative" ref={searchRef}>
          <div className="relative group">
@@ -117,7 +125,7 @@ export function Header() {
            </button>
 
            {showDropdown && (
-             <div className="absolute right-0 mt-4 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200">
+             <div className="absolute right-0 mt-4 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-50">
                <div className="p-4 border-b border-gray-50 bg-gray-50 font-black text-xs uppercase tracking-widest text-gray-900">Notifikasi</div>
                <div className="max-h-80 overflow-y-auto no-scrollbar">
                  {notifications.length > 0 ? notifications.map(n => (
@@ -135,16 +143,16 @@ export function Header() {
 
          <button 
            onClick={() => navigate('/profile')} 
-           className="flex items-center gap-3 bg-gray-900 text-white px-5 py-2.5 rounded-xl hover:bg-blue-600 transition-all shadow-lg active:scale-95 group"
+           className="flex items-center gap-2 md:gap-3 bg-gray-900 text-white px-3 py-2 md:px-5 md:py-2.5 rounded-xl hover:bg-blue-600 transition-all shadow-lg active:scale-95 group shrink-0"
          >
-           <div className="h-6 w-6 rounded-lg bg-white/10 flex items-center justify-center overflow-hidden border border-white/20 group-hover:border-white/40 transition-colors">
+           <div className="h-6 w-6 rounded-lg bg-white/10 flex items-center justify-center overflow-hidden border border-white/20 group-hover:border-white/40 transition-colors shrink-0">
              {user.avatar ? (
                <img src={user.avatar} alt={user.name} className="h-full w-full object-cover" />
              ) : (
                <span className="text-[10px] font-black">{user.name[0]}</span>
              )}
            </div>
-           <span className="text-[11px] font-black uppercase tracking-[0.1em] hidden lg:block">Profile</span>
+           <span className="text-[11px] font-black uppercase tracking-[0.1em] hidden sm:block">Profile</span>
          </button>
        </div>
      </div>

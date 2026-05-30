@@ -69,21 +69,19 @@
   background: #94a3b8;
 }
 
-/* Hapus Animasi Masuk (Entrance Animations) */
-.animate-in, 
-[class*="fade-in"], 
-[class*="zoom-in"], 
-[class*="slide-in-from-"],
-[class*="duration-"],
-[class*="delay-"] {
+/* Hapus Animasi Masuk (Hanya untuk Entrance Animations) */
+.animate-in {
   animation: none !important;
-  transition: none !important;
-  opacity: 1 !important;
-  transform: none !important;
   --tw-enter-opacity: 1 !important;
   --tw-enter-scale: 1 !important;
   --tw-enter-translate-x: 0 !important;
   --tw-enter-translate-y: 0 !important;
+}
+
+.fade-in, .zoom-in, .slide-in-from-top, .slide-in-from-bottom {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
 }
 
 /* Pengecualian: Biarkan animasi memuat tetap berjalan */

@@ -68,44 +68,44 @@ export function Dashboard() {
   const displayUser = authUser;
 
   return (
-    <div className="min-h-screen bg-[#F8F9FB] p-4 md:p-8 space-y-6 bg-white rounded-xl border border-1">
-      
+    <div className="w-full space-y-6 md:space-y-8 pb-10 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm">
+
       {/* HEADER SECTION - Status Ribbon */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-        <div className="flex items-center gap-5">
-          <div className="h-14 w-14 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-xl shadow-md overflow-hidden">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-gray-50/50 p-6 md:p-8 rounded-3xl md:rounded-[2.5rem] border border-gray-100/50">
+        <div className="flex items-center gap-4 md:gap-6">
+          <div className="h-12 w-12 md:h-14 md:h-14 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg md:text-xl shadow-md overflow-hidden shrink-0">
             {displayUser?.avatar ? (
               <img src={displayUser.avatar} alt={displayUser.name} className="h-full w-full object-cover" />
             ) : (
               displayUser?.name?.[0]
             )}
           </div>
-          <div>
-            <h2 className="text-xl font-bold text-gray-900">{displayUser?.name}</h2>
-            <p className="text-xs text-gray-500 font-medium">{displayUser?.role} • Semester {displayUser?.semester || '6'}</p>
+          <div className="min-w-0">
+            <h2 className="text-lg md:text-xl font-bold text-gray-900 truncate">{displayUser?.name}</h2>
+            <p className="text-[10px] md:text-xs text-gray-500 font-medium">{displayUser?.role} • Semester {displayUser?.semester || '6'}</p>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-6 md:gap-10">
+        <div className="flex flex-wrap items-center gap-4 md:gap-10">
           <div className="flex items-center gap-3">
-             <div className="p-2.5 bg-white rounded-xl shadow-sm border border-gray-100">
-                <Trophy size={18} className="text-yellow-500" />
+             <div className="p-2 md:p-2.5 bg-white rounded-xl shadow-sm border border-gray-100">
+                <Trophy size={16} className="text-yellow-500 md:w-[18px] md:h-[18px]" />
              </div>
              <div>
-                <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Total Poin</p>
-                <p className="text-sm font-black text-gray-900 leading-none">{displayUser?.points?.toLocaleString()} XP</p>
+                <p className="text-[8px] md:text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Total XP</p>
+                <p className="text-xs md:text-sm font-black text-gray-900 leading-none">{displayUser?.points?.toLocaleString()}</p>
              </div>
           </div>
 
-          <div className="h-10 w-px bg-gray-200 hidden sm:block"></div>
+          <div className="h-8 md:h-10 w-px bg-gray-100 hidden sm:block"></div>
 
           <div className="flex items-center gap-3">
-             <div className="p-2.5 bg-white rounded-xl shadow-sm border border-gray-100">
-                <Star size={18} className="text-blue-500" />
+             <div className="p-2 md:p-2.5 bg-white rounded-xl shadow-sm border border-gray-100">
+                <Star size={16} className="text-blue-500 md:w-[18px] md:h-[18px]" />
              </div>
              <div>
-                <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Level Saat Ini</p>
-                <p className="text-sm font-black text-blue-600 leading-none uppercase">Level {displayUser?.level}</p>
+                <p className="text-[8px] md:text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Status</p>
+                <p className="text-xs md:text-sm font-black text-blue-600 leading-none uppercase">Lvl {displayUser?.level}</p>
              </div>
           </div>
 
@@ -176,68 +176,68 @@ export function Dashboard() {
           </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
         {/* BANNER UTAMA: Balanced Hero Design */}
-        <div className="lg:col-span-2 relative overflow-hidden bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl p-8 md:p-10 text-white shadow-xl group border border-white/10 min-h-[320px] flex flex-col justify-center">
+        <div className="lg:col-span-2 relative overflow-hidden bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl p-6 md:p-10 text-white shadow-xl group border border-white/10 min-h-[260px] md:min-h-[320px] flex flex-col justify-center">
           
           {/* Efek Visual Background */}
           <div className="absolute inset-2 bg-white/5 rounded-[2.5rem] backdrop-blur-[2px] pointer-events-none"></div>
           
-          {/* Ikon Background Artistik - Mengisi kekosongan secara visual */}
-          <div className="absolute -right-10 -bottom-10 opacity-10 group-hover:scale-110 group-hover:-rotate-12 transition-all duration-1000 pointer-events-none">
-            <BookOpen size={320} className="text-white" />
+          {/* Ikon Background Artistik - Always visible (small), expands on hover */}
+          <div className="absolute -right-8 -bottom-8 md:-right-10 md:-bottom-10 opacity-[0.04] group-hover:opacity-[0.12] scale-75 group-hover:scale-110 -rotate-12 transition-all duration-700 ease-out pointer-events-none">
+            <BookOpen size={180} strokeWidth={1} className="text-white md:w-[280px] md:h-[280px]" />
           </div>
           
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-32 -mt-16 group-hover:scale-125 transition-transform duration-1000"></div>
 
-          <div className="relative z-10 max-w-2xl space-y-6">
+          <div className="relative z-10 max-w-[85%] md:max-w-2xl space-y-4 md:space-y-6">
             <div className="flex items-center gap-2">
-              <div className="bg-white/20 p-2 rounded-xl backdrop-blur-md border border-white/10">
-                <BookOpen className="h-5 w-5 text-white" />
+              <div className="bg-white/20 p-1.5 md:p-2 rounded-xl backdrop-blur-md border border-white/10">
+                <BookOpen className="h-4 w-4 md:h-5 md:w-5 text-white" />
               </div>
-              <span className="text-[11px] font-black uppercase tracking-[0.25em] text-blue-100">Portal Mahasiswa UM</span>
+              <span className="text-[9px] md:text-[11px] font-black uppercase tracking-[0.25em] text-blue-100">Portal Mahasiswa UM</span>
             </div>
             
-            <h2 className="text-3xl md:text-5xl font-black tracking-tighter leading-[1.1] whitespace-pre-line drop-shadow-sm">
+            <h2 className="text-2xl md:text-5xl font-black tracking-tighter leading-[1.1] whitespace-pre-line drop-shadow-sm">
               {settings.dashboard_banner_text}
             </h2>
             
-            <div className="pt-4">
+            <div className="pt-2 md:pt-4">
               <Link 
                 to="/courses" 
-                className="inline-flex items-center gap-3 bg-white text-blue-600 px-10 py-4 rounded-2xl text-[11px] font-black uppercase tracking-[0.2em] hover:bg-blue-50 transition-all shadow-2xl shadow-blue-900/20 active:scale-95 group/btn"
+                className="inline-flex items-center gap-3 bg-white text-blue-600 px-6 py-3 md:px-10 md:py-4 rounded-2xl text-[9px] md:text-[11px] font-black uppercase tracking-[0.2em] hover:bg-blue-50 transition-all shadow-2xl shadow-blue-900/20 active:scale-95 group/btn"
               >
-                Mulai Berlatih Sekarang
-                <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                Mulai Berlatih
+                <ChevronRight className="h-3 w-3 md:h-4 md:w-4 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
           </div>
         </div>
         <div className="uiverse-parent lg:col-span-1">
-          <div className="uiverse-card bg-white rounded-2xl p-8 h-full shadow-xl border border-gray-50 flex flex-col justify-between overflow-hidden relative group">
+          <div className="uiverse-card bg-white rounded-3xl p-6 md:p-8 h-full shadow-xl border border-gray-50 flex flex-col justify-between overflow-hidden relative group">
             <div className="logo pointer-events-none">
               <span className="uiverse-logo-circle w-32 h-32 -top-4 -right-4 bg-blue-600/5 opacity-20 group-hover:scale-110 transition-transform duration-700"></span>
               <span className="uiverse-logo-circle w-24 h-24 top-2 right-2 bg-blue-600/10 opacity-30"></span>
             </div>
             <div className="uiverse-glass !rounded-2xl"></div>
             <div className="uiverse-content relative z-10">
-              <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-6">Peringkat Anda</h3>
+              <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4 md:mb-6">Peringkat Anda</h3>
               <div className="flex items-center gap-5">
-                <div className="h-16 w-16 bg-blue-50 rounded-xl flex items-center justify-center border border-blue-100 shadow-inner group-hover:rotate-6 transition-transform">
-                  <Crown className="h-8 w-8 text-blue-600" />
+                <div className="h-14 w-14 md:h-16 md:w-16 bg-blue-50 rounded-xl flex items-center justify-center border border-blue-100 shadow-inner group-hover:rotate-6 transition-transform">
+                  <Crown className="h-7 w-7 md:h-8 md:w-8 text-blue-600" />
                 </div>
                 <div>
-                  <p className="text-5xl font-black text-gray-900 tracking-tighter">#{displayUser?.rank || '1'}</p>
-                  <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest mt-1">
-                    Peringkat Global Anda
+                  <p className="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">#{displayUser?.rank || '1'}</p>
+                  <p className="text-[9px] md:text-[10px] font-bold text-blue-600 uppercase tracking-widest mt-1">
+                    Peringkat Global
                   </p>
                 </div>
               </div>
             </div>
-            <Link to="/leaderboard" className="uiverse-content relative z-10 mt-8 flex items-center justify-between group/btn p-4 bg-gray-50 rounded-xl hover:bg-blue-600 hover:text-white transition-all duration-300">
-              <span className="text-[10px] font-black uppercase tracking-widest">Buka Leaderboard</span>
-              <div className="p-2 bg-white rounded-lg text-gray-900 shadow-sm group-hover/btn:scale-110 transition-transform">
-                <ChevronRight className="h-4 w-4" />
+            <Link to="/leaderboard" className="uiverse-content relative z-10 mt-6 md:mt-8 flex items-center justify-between group/btn p-3 md:p-4 bg-gray-50 rounded-xl hover:bg-blue-600 hover:text-white transition-all duration-300">
+              <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest">Buka Leaderboard</span>
+              <div className="p-1.5 md:p-2 bg-white rounded-lg text-gray-900 shadow-sm group-hover/btn:scale-110 transition-transform">
+                <ChevronRight className="h-3 w-3 md:h-4 md:w-4" />
               </div>
             </Link>
           </div>
@@ -246,26 +246,26 @@ export function Dashboard() {
 
       <div className="space-y-6">
         <section className="space-y-4">
-          <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] px-1 text-[9px]">Statistik Performa</h3>
+          <h3 className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] px-1">Statistik Performa</h3>
           <StatsCards />
         </section>
         <section className="space-y-4">
-          <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] px-1 text-[9px]">Quick Actions</h3>
+          <h3 className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] px-1">Quick Actions</h3>
           <QuickActions />
         </section>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-10">
-        <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm">
-          <div className="flex items-center justify-between mb-8">
-            <h3 className="text-[11px] font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
-              <Star className="h-4 w-4 text-blue-600" /> Active Lessons
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-20">
+        <div className="bg-white rounded-3xl border border-gray-100 p-6 md:p-8 shadow-sm">
+          <div className="flex items-center justify-between mb-6 md:mb-8">
+            <h3 className="text-[10px] md:text-[11px] font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
+              <Star className="h-3.5 w-3.5 md:h-4 md:w-4 text-blue-600" /> Active Lessons
             </h3>
           </div>
           <ProgressOverview userData={displayUser} />
         </div>
-        <div className="bg-white rounded-2xl border border-gray-100 p-8 shadow-sm">
-          <h3 className="text-[11px] font-black text-gray-900 uppercase tracking-widest mb-8">Recent Activities</h3>
+        <div className="bg-white rounded-3xl border border-gray-100 p-6 md:p-8 shadow-sm">
+          <h3 className="text-[10px] md:text-[11px] font-black text-gray-900 uppercase tracking-widest mb-6 md:mb-8">Recent Activities</h3>
           <RecentActivity />
         </div>
       </div>

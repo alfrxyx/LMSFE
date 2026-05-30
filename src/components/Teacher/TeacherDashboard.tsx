@@ -86,31 +86,34 @@ export function TeacherDashboard({
   }, []);
 
   return (
-    <div className="w-full min-h-[80vh] space-y-8 p-4 md:p-8 bg-white rounded-xl border border-gray-100 flex flex-col">
-      {/* HEADER SECTION (LAYOUT KELOLA MATERI) */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 shrink-0">
-        <div>
-          <h1 className="text-4xl font-black text-gray-900 tracking-tight flex items-center gap-3 uppercase">
-            Teacher Panel <LayoutDashboard className="h-10 w-10 text-blue-600" />
-          </h1>
-          <p className="mt-2 text-gray-500 font-medium italic">
-            Monitor performa dan evaluasi tugas praktik mahasiswa.
-          </p>
+    <div className="w-full space-y-8 pb-10 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm flex flex-col">
+      {/* COMPACT HEADER SECTION */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 shrink-0 bg-gray-50/50 p-6 md:p-8 rounded-[2rem] border border-gray-100/50">
+        <div className="flex items-center gap-4">
+          <div className="h-12 w-12 bg-white rounded-2xl flex items-center justify-center text-blue-600 shadow-sm border border-gray-100">
+            <LayoutDashboard size={24} />
+          </div>
+          <div>
+            <h1 className="text-xl font-black text-gray-900 tracking-tight leading-none">
+              Dashboard analysis
+            </h1>
+            <p className="text-[10px] text-gray-400 font-bold tracking-widest mt-1">Analysis Control Center</p>
+          </div>
         </div>
 
-        {/* TAB NAVIGATION (DESIGN KELOLA MATERI) */}
-        <div className="flex bg-gray-100 p-1.5 rounded-2xl self-start lg:self-center shadow-sm">
+        {/* TAB NAVIGATION (MATCHING COMPACT STYLE) */}
+        <div className="flex bg-white/50 p-1.5 rounded-2xl shadow-sm border border-gray-100">
           {teacherTabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center gap-2 ${
+              className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${
                 activeTab === tab.id
-                  ? "bg-white text-blue-600 shadow-md"
-                  : "text-gray-400 hover:text-gray-600"
+                  ? "bg-blue-600 text-white shadow-lg shadow-blue-100"
+                  : "text-gray-400 hover:text-gray-600 hover:bg-white"
               }`}
             >
-              <tab.icon className="h-4 w-4" />
+              <tab.icon className="h-3.5 w-3.5" />
               <span>{tab.name}</span>
             </button>
           ))}
@@ -199,7 +202,7 @@ function StatCard({ label, value, icon: Icon, onClick, sublabel }: any) {
   return (
     <div 
       onClick={onClick}
-      className={`uiverse-card bg-white h-[240px] rounded-[40px] shadow-xl border border-gray-100 flex flex-col items-center justify-center text-center p-8 group overflow-hidden transition-all ${onClick ? 'cursor-pointer active:scale-95' : ''}`}
+      className={`uiverse-card bg-white min-h-[240px] h-auto rounded-[40px] shadow-xl border border-gray-100 flex flex-col items-center justify-center text-center p-8 group overflow-hidden transition-all ${onClick ? 'cursor-pointer active:scale-95' : ''}`}
     >
       {/* Glass Layer - Subtle light effect for white card */}
       <div className="uiverse-glass !opacity-10 !bg-gray-50"></div>
