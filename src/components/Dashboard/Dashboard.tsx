@@ -58,9 +58,9 @@ export function Dashboard() {
 
   if (authLoading || loading) {
     return (
-      <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
-        <Loader2 className="h-12 w-12 text-blue-600 animate-spin" />
-        <p className="text-gray-500 font-black uppercase tracking-widest text-[10px]">Menyiapkan Dashboard Mahasiswa PJKR...</p>
+      <div className="flex flex-col items-center justify-center h-[60vh]">
+        <div className="h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p className="text-gray-500 font-bold uppercase text-[10px] tracking-widest animate-pulse">Memuat Dashboard PJKR...</p>
       </div>
     );
   }
@@ -152,7 +152,7 @@ export function Dashboard() {
               </button>
 
               {showAnnouncements && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {announcements.map((ann) => (
                           <div key={ann.id} className={`p-5 rounded-2xl border flex gap-4 transition-all hover:shadow-md ${
                               ann.type === 'warning' ? 'bg-orange-50 border-orange-100 text-orange-800' :

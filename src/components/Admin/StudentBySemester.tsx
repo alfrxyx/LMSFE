@@ -47,7 +47,7 @@ export function StudentBySemester() {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh]">
         <div className="h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p className="text-gray-500 font-bold uppercase text-[10px] tracking-widest">Memuat Daftar Mahasiswa...</p>
+        <p className="text-gray-500 font-bold uppercase text-[10px] tracking-widest animate-pulse">Memuat Daftar Mahasiswa...</p>
       </div>
     );
   }

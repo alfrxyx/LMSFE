@@ -32,12 +32,12 @@ const TeacherDashboard = lazy(() => import('./components/Teacher/TeacherDashboar
 // =======================================================
 
 function LoadingScreen() {
- return (
- <div className="flex flex-col items-center justify-center h-screen bg-white space-y-4">
- <Loader2 className="h-12 w-12 text-blue-600 animate-spin" />
- <p className="text-gray-500 font-black uppercase tracking-widest text-[10px]">Menyiapkan Sistem PJKR...</p>
- </div>
- );
+  return (
+    <div className="flex flex-col items-center justify-center h-screen bg-white">
+      <div className="h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+      <p className="text-gray-500 font-bold uppercase text-[10px] tracking-widest animate-pulse">Menyiapkan Sistem PJKR...</p>
+    </div>
+  );
 }
 
 // Suspense Wrapper

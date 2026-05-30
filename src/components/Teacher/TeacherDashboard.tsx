@@ -42,6 +42,18 @@ export function TeacherDashboard({
   const [loading, setLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
 
+  // TABS CONFIGURATION (SAMA SEPERTI KELOLA MATERI)
+  const teacherTabs = [
+    { id: "overview", name: "Analytics", icon: Activity },
+    { id: "submissions", name: "Penilaian", icon: FileText },
+  ];
+
+  const semesterXPStats = [1, 2, 3, 4, 5, 6, 7, 8].map((sem) => {
+    const studentsInSem = (monitoringData || []).filter((s) => s.semester?.toString() === sem.toString());
+    const avgXP = studentsInSem.length > 0 ? Math.round(studentsInSem.reduce((sum, s) => sum + (s.points || 0), 0) / studentsInSem.length) : 0;
+    return { name: `S${sem}`, avgXP };
+  });
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
@@ -73,29 +85,10 @@ export function TeacherDashboard({
     fetchDashboardData();
   }, []);
 
-  if (loading) return (
-    <div className="flex flex-col items-center justify-center h-[60vh]">
-      <Loader2 className="h-10 w-10 animate-spin text-blue-600 mb-4" />
-      <p className="text-gray-400 font-bold uppercase text-[10px] tracking-widest">Menyiapkan Dashboard Dosen...</p>
-    </div>
-  );
-
-  const semesterXPStats = [1, 2, 3, 4, 5, 6, 7, 8].map((sem) => {
-    const studentsInSem = monitoringData.filter((s) => s.semester?.toString() === sem.toString());
-    const avgXP = studentsInSem.length > 0 ? Math.round(studentsInSem.reduce((sum, s) => sum + (s.points || 0), 0) / studentsInSem.length) : 0;
-    return { name: `S${sem}`, avgXP };
-  });
-
-  // TABS CONFIGURATION (SAMA SEPERTI KELOLA MATERI)
-  const teacherTabs = [
-    { id: "overview", name: "Analytics", icon: Activity },
-    { id: "submissions", name: "Penilaian", icon: FileText },
-  ];
-
   return (
-    <div className="space-y-8 p-4 md:p-8 bg-white rounded-xl border border-gray-100">
+    <div className="w-full min-h-[80vh] space-y-8 p-4 md:p-8 bg-white rounded-xl border border-gray-100 flex flex-col">
       {/* HEADER SECTION (LAYOUT KELOLA MATERI) */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 shrink-0">
         <div>
           <h1 className="text-4xl font-black text-gray-900 tracking-tight flex items-center gap-3 uppercase">
             Teacher Panel <LayoutDashboard className="h-10 w-10 text-blue-600" />
@@ -124,89 +117,110 @@ export function TeacherDashboard({
         </div>
       </div>
 
-      {activeTab === "overview" ? (
-        <div className="space-y-8 animate-in fade-in duration-500">
-          {/* STATS GRID */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <StatCard label="Total Mahasiswa" value={stats?.total_students} icon={Users} color="blue" />
-            <StatCard label="Progres Kelas" value={`${stats?.pedagogical_stats?.avg_class_progress}%`} icon={TrendingUp} color="green" />
-            <StatCard label="Mahasiswa Pasif" value={stats?.pedagogical_stats?.at_risk_count} icon={AlertCircle} color="red" />
-            <StatCard label="Pending Tugas" value={submissionsCount} icon={Clock} color="orange" onClick={() => setActiveTab("submissions")} />
-          </div>
-
-          {/* CHARTS */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
-              <h3 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-8 flex items-center gap-2">
-                 <BarChart3 size={18} className="text-blue-600" /> Penyelesaian Materi
-              </h3>
-              <div className="h-64 w-full">
-                {isMounted && (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={stats?.pedagogical_stats?.difficult_materials || []}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                      <XAxis dataKey="title" axisLine={false} tickLine={false} tick={{ fill: "#94a3b8", fontSize: 10, fontWeight: 700 }} dy={10} />
-                      <YAxis axisLine={false} tickLine={false} tick={{ fill: "#94a3b8", fontSize: 10 }} />
-                      <Tooltip cursor={{fill: '#f8fafc', radius: 10}} />
-                      <Bar dataKey="completions" fill="#3b82f6" radius={[6, 6, 0, 0]} barSize={32} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                )}
-              </div>
-            </div>
-            
-            <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
-              <h3 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-8 flex items-center gap-2">
-                 <Activity size={18} className="text-blue-600" /> Tren Performa XP
-              </h3>
-              <div className="h-64 w-full">
-                {isMounted && (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={semesterXPStats}>
-                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                      <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "#94a3b8", fontSize: 10, fontWeight: 700 }} />
-                      <Tooltip />
-                      <Area type="monotone" dataKey="avgXP" stroke="#3b82f6" strokeWidth={3} fill="#3b82f6" fillOpacity={0.05} />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* MONITORING CONTAINER */}
-          <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
-            <div className="p-8 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
-              <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest">Student Progress Monitoring</h3>
-            </div>
-            <div className="p-8">
-              <StudentMonitoring />
-            </div>
-          </div>
+      {loading ? (
+        <div className="flex-1 flex flex-col items-center justify-center py-20">
+          <div className="h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-gray-400 font-bold uppercase text-[10px] tracking-widest animate-pulse">Menyiapkan Dashboard Dosen...</p>
         </div>
       ) : (
-        <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm min-h-[50vh] animate-in fade-in duration-500">
-          <SubmissionsPanel onGradeComplete={fetchDashboardData} />
+        <div className="flex-1 w-full">
+          {activeTab === "overview" ? (
+            <div className="space-y-8 w-full">
+              {/* STATS GRID */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 uiverse-parent w-full">
+                <StatCard label="Total Mahasiswa" value={stats?.total_students} icon={Users} sublabel="DATABASE" />
+                <StatCard label="Progres Kelas" value={`${stats?.pedagogical_stats?.avg_class_progress || 0}%`} icon={TrendingUp} sublabel="RATA-RATA" />
+                <StatCard label="Mahasiswa Aktif" value={(stats?.total_students || 0) - (stats?.pedagogical_stats?.at_risk_count || 0)} icon={Activity} sublabel="PRODUKTIF" />
+                <StatCard label="Pending Tugas" value={submissionsCount} icon={Clock} sublabel="PERLU NILAI" onClick={() => setActiveTab("submissions")} />
+              </div>
+
+              {/* CHARTS */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full">
+                <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm min-h-[400px]">
+                  <h3 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-8 flex items-center gap-2">
+                     <BarChart3 size={18} className="text-blue-600" /> Penyelesaian Materi
+                  </h3>
+                  <div className="h-64 w-full">
+                    {isMounted && stats?.pedagogical_stats?.difficult_materials && (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={stats.pedagogical_stats.difficult_materials}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                          <XAxis dataKey="title" axisLine={false} tickLine={false} tick={{ fill: "#94a3b8", fontSize: 10, fontWeight: 700 }} dy={10} />
+                          <YAxis axisLine={false} tickLine={false} tick={{ fill: "#94a3b8", fontSize: 10 }} />
+                          <Tooltip cursor={{fill: '#f8fafc', radius: 10}} />
+                          <Bar dataKey="completions" fill="#3b82f6" radius={[6, 6, 0, 0]} barSize={32} />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm min-h-[400px]">
+                  <h3 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-8 flex items-center gap-2">
+                     <Activity size={18} className="text-blue-600" /> Tren Performa XP
+                  </h3>
+                  <div className="h-64 w-full">
+                    {isMounted && semesterXPStats.length > 0 && (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={semesterXPStats}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                          <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "#94a3b8", fontSize: 10, fontWeight: 700 }} />
+                          <Tooltip />
+                          <Area type="monotone" dataKey="avgXP" stroke="#3b82f6" strokeWidth={3} fill="#3b82f6" fillOpacity={0.05} />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* MONITORING CONTAINER */}
+              <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden w-full">
+                <div className="p-8 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
+                  <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest">Student Progress Monitoring</h3>
+                </div>
+                <div className="p-8 w-full">
+                  <StudentMonitoring />
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm min-h-[60vh] animate-in fade-in duration-500 w-full">
+              <SubmissionsPanel onGradeComplete={fetchDashboardData} />
+            </div>
+          )}
         </div>
       )}
     </div>
   );
 }
 
-function StatCard({ label, value, icon: Icon, color, onClick }: any) {
-  const colors: any = {
-    blue: "bg-blue-50 text-blue-600",
-    green: "bg-green-50 text-green-600",
-    red: "bg-red-50 text-red-600",
-    orange: "bg-orange-50 text-orange-600"
-  };
+function StatCard({ label, value, icon: Icon, onClick, sublabel }: any) {
   return (
-    <div onClick={onClick} className={`bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-6 group hover:border-blue-200 transition-all ${onClick ? 'cursor-pointer active:scale-95' : ''}`}>
-      <div className={`p-4 rounded-2xl ${colors[color]} group-hover:scale-110 transition-transform`}><Icon size={24} /></div>
-      <div>
-        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">{label}</p>
-        <p className="text-2xl font-black text-gray-900">{value || 0}</p>
+    <div 
+      onClick={onClick}
+      className={`uiverse-card bg-white h-[240px] rounded-[40px] shadow-xl border border-gray-100 flex flex-col items-center justify-center text-center p-8 group overflow-hidden transition-all ${onClick ? 'cursor-pointer active:scale-95' : ''}`}
+    >
+      {/* Glass Layer - Subtle light effect for white card */}
+      <div className="uiverse-glass !opacity-10 !bg-gray-50"></div>
+
+      {/* Ikon Stat - Blue accent for white card */}
+      <div className="uiverse-content p-3 bg-blue-50 rounded-2xl mb-4 group-hover:scale-110 transition-transform">
+        <Icon className="h-6 w-6 text-blue-600" />
       </div>
+      
+      <div className="uiverse-content space-y-1">
+        <span className="text-4xl font-black text-gray-900 tracking-tighter">
+          {value || 0}
+        </span>
+        <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">
+          {sublabel}
+        </p>
+      </div>
+
+      <p className="uiverse-content mt-4 text-[9px] font-bold text-gray-400 uppercase tracking-[0.2em]">
+        {label}
+      </p>
     </div>
   );
 }

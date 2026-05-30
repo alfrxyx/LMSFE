@@ -27,9 +27,9 @@ export function Achievements() {
 
  if (loading) {
  return (
- <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
- <Loader2 className="h-12 w-12 text-blue-600 animate-spin" />
- <p className="text-gray-500 font-black uppercase tracking-widest text-[10px]">Memuat Lencana PJKR...</p>
+ <div className="flex flex-col items-center justify-center h-[60vh]">
+ <div className="h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+ <p className="text-gray-500 font-black uppercase tracking-widest text-[10px] animate-pulse">Memuat Lencana PJKR...</p>
  </div>
  );
  }
