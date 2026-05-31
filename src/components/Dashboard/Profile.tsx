@@ -74,7 +74,7 @@ export function Profile() {
                 </h1>
                 <div className="flex items-center gap-2 bg-blue-50 text-blue-700 text-[10px] font-black px-3 py-1.5 rounded-xl uppercase tracking-[0.15em] border border-blue-100 shadow-sm">
                   <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
-                  Verified Student
+                  {user.role === 'admin' ? 'Administrator Platform' : user.role === 'teacher' || user.role === 'dosen' ? 'Dosen Pengampu' : 'Mahasiswa Aktif'}
                 </div>
               </div>
 
