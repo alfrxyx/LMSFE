@@ -5,12 +5,17 @@ import {
   GraduationCap, Calendar, Mail, Hash
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { StudentDetailModal } from './StudentDetailModal';
 
 export function StudentBySemester() {
   const [students, setStudents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [semesterFilter, setSemesterFilter] = useState('all');
+
+  // State for Detail Modal
+  const [selectedStudent, setSelectedStudent] = useState<any | null>(null);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
   const fetchStudents = async () => {
     try {
@@ -100,7 +105,14 @@ export function StudentBySemester() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {groupedBySemester[semester].map((student: any) => (
-                  <div key={student.id} className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group">
+                  <div 
+                    key={student.id} 
+                    onClick={() => {
+                      setSelectedStudent(student);
+                      setIsDetailModalOpen(true);
+                    }}
+                    className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group"
+                  >
                     <div className="flex items-start gap-4">
                       <div className="h-12 w-12 rounded-xl bg-gray-50 flex items-center justify-center text-blue-600 font-black text-lg border border-gray-100 group-hover:bg-blue-600 group-hover:text-white transition-all overflow-hidden">
                         {student.avatar ? (
@@ -144,6 +156,16 @@ export function StudentBySemester() {
           </div>
         )}
       </div>
+
+      {/* Student Detail Modal */}
+      <StudentDetailModal 
+        isOpen={isDetailModalOpen}
+        student={selectedStudent}
+        onClose={() => {
+          setIsDetailModalOpen(false);
+          setSelectedStudent(null);
+        }}
+      />
     </div>
   );
 }

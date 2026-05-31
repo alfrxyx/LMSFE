@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import api from '../../api/axios';
 import { 
  ArrowLeft, Lock, CheckCircle, Youtube, FileText, Send, Trophy, Loader2, AlertCircle,
- MessageSquare, X, Play, BookOpen, GraduationCap, ChevronRight, Sparkles, BarChart3, Star, Activity
+ MessageSquare, X, Play, BookOpen, GraduationCap, ChevronRight, Sparkles, BarChart3, Star, Activity, Clock
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { toast } from 'sonner';

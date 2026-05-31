@@ -5,6 +5,7 @@ import {
  Edit2, Loader2, UserPlus, Hash, GraduationCap, Phone
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { StudentDetailModal } from './StudentDetailModal';
 
 export function StudentManagement() {
  const { token } = useAuth();
@@ -12,6 +13,10 @@ export function StudentManagement() {
  const [loading, setLoading] = useState(true);
  const [searchTerm, setSearchTerm] = useState('');
  const [semesterFilter, setSemesterFilter] = useState<string>('all');
+ 
+ // State for Detail Modal
+ const [selectedStudent, setSelectedStudent] = useState<any | null>(null);
+ const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
  // Fetch data mahasiswa dari AdminController@indexUsers
  useEffect(() => {
@@ -107,7 +112,14 @@ export function StudentManagement() {
  </thead>
  <tbody className="divide-y divide-gray-50">
  {filteredStudents.map((student) => (
- <tr key={student.id} className="hover:bg-blue-50/30 transition-colors">
+ <tr 
+   key={student.id} 
+   onClick={() => {
+     setSelectedStudent(student);
+     setIsDetailModalOpen(true);
+   }}
+   className="hover:bg-blue-50/30 transition-colors cursor-pointer"
+ >
  <td className="px-6 py-5">
  <div className="flex items-center gap-4">
  <div className="h-12 w-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center font-black shadow-lg shadow-blue-100 overflow-hidden">
@@ -175,6 +187,17 @@ export function StudentManagement() {
  </div>
  )}
  </div>
+ </div>
+
+ {/* Student Detail Modal */}
+ <StudentDetailModal 
+   isOpen={isDetailModalOpen}
+   student={selectedStudent}
+   onClose={() => {
+     setIsDetailModalOpen(false);
+     setSelectedStudent(null);
+   }}
+ />
  </div>
  );
 }

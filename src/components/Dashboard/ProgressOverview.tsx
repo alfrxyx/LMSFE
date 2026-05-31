@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { useApp } from "../../contexts/AppContext";
 import { CheckCircle, Play, Loader2, AlertCircle, Clock } from "lucide-react";
 
@@ -26,144 +27,140 @@ export function ProgressOverview({ userData }: { userData: any }) {
     );
   }
 
-  const activeCourse = courses[0];
-  const levels = Array.isArray(activeCourse.levels) ? activeCourse.levels : [];
-
   // Ambil ID dari user data profil (Backend Baru)
   const completedFromProfile = Array.isArray(userData?.completed_level_ids)
     ? userData.completed_level_ids.map((id: any) => Number(id))
     : [];
 
-  // Ambil ID dari data courses (Backend Index) - Sebagai cadangan
-  const completedFromCourses = levels
-    .filter((l: any) => l.is_completed === true || l.is_completed === 1)
-    .map((l: any) => Number(l.id));
-
-  // Gabungkan keduanya agar tidak ada yang terlewat (Master Set)
-  const masterCompletedIds = Array.from(
-    new Set([...completedFromProfile, ...completedFromCourses]),
-  );
-
-  const completedCount = levels.filter((l: any) =>
-    masterCompletedIds.includes(Number(l.id)),
-  ).length;
-
   return (
-    <div className="">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-3">
-        <div>
-          <h3 className="text-lg font-black text-gray-900 tracking-tight">
-            {activeCourse.title}
-          </h3>
-          <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">
-            Struktur Kurikulum PJKR
-          </p>
-        </div>
-        <div className="bg-blue-600 text-white px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest shadow-lg shadow-blue-100 uppercase">
-          {completedCount} / {levels.length} SELESAI
-        </div>
-      </div>
+    <div className="space-y-10">
+      {courses.map((course: any) => {
+        const levels = Array.isArray(course.levels) ? course.levels : [];
+        
+        // Gabungkan status penyelesaian dari profil dan data course
+        const courseCompletedCount = levels.filter((l: any) => 
+          completedFromProfile.includes(Number(l.id)) || l.is_completed === true || l.is_completed === 1
+        ).length;
 
-      <div className="space-y-4">
-        {levels.length > 0 ? (
-          levels.map((level: any, index: number) => {
-            const isDone = masterCompletedIds.includes(Number(level.id));
+        const progressPercent = levels.length > 0 ? Math.round((courseCompletedCount / levels.length) * 100) : 0;
 
-            return (
-              <div
-                key={level.id || index}
-                className={`group flex items-center justify-between p-4 rounded-2xl transition-all border ${
-                  isDone
-                    ? "bg-gray-50/50 border-gray-100 opacity-70"
-                    : "bg-white border-blue-50 shadow-sm hover:shadow-md hover:border-blue-200"
-                }`}
-              >
-                <div className="flex items-center space-x-4">
-                  <div
-                    className={`h-10 w-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 ${
-                      isDone
-                        ? "bg-green-100 shadow-inner"
-                        : "bg-blue-600 shadow-lg shadow-blue-100"
-                    }`}
-                  >
-                    {isDone ? (
-                      <CheckCircle className="h-5 w-5 text-green-600" />
-                    ) : (
-                      <Play className="h-4 w-4 text-white fill-current ml-0.5" />
-                    )}
-                  </div>
-                  <div>
-                    <p
-                      className={`text-sm font-black tracking-tight ${isDone ? "text-gray-500 line-through" : "text-gray-900"}`}
-                    >
-                      {level.title || level.name || `Pertemuan ${index + 1}`}
-                    </p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
-                        PERTEMUAN {index + 1}
-                      </span>
-                      {!isDone && level.deadline && (
-                        <div className="flex items-center gap-1 text-[8px] font-black text-red-500 uppercase tracking-widest bg-red-50 px-2 py-0.5 rounded-md">
-                          <Clock size={10} />
-                          {new Date(level.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="flex items-center gap-1.5 bg-gray-50 px-3 py-1 rounded-lg border border-gray-100 group-hover:bg-blue-50 group-hover:border-blue-100 transition-colors">
-                    <span className="text-[10px] font-black text-blue-600 uppercase tracking-tighter">
-                      +{level.xp_reward || level.points || 0} XP
-                    </span>
-                  </div>
-                </div>
+        return (
+          <div key={course.id} className="animate-in fade-in duration-700">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-3">
+              <div>
+                <h3 className="text-lg font-black text-gray-900 tracking-tight uppercase">
+                  {course.title}
+                </h3>
+                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">
+                  Mata Kuliah Semester {course.semester}
+                </p>
               </div>
-            );
-          })
-        ) : (
-          <div className="text-center py-10 border-2 border-dashed border-gray-100 rounded-3xl">
-            <p className="text-[10px] font-black text-gray-300 uppercase tracking-[0.3em]">
-              Materi Kosong
-            </p>
-          </div>
-        )}
-      </div>
+              <div className="bg-blue-600 text-white px-4 py-1.5 rounded-full text-[10px] font-black tracking-widest shadow-lg shadow-blue-100 uppercase">
+                {courseCompletedCount} / {levels.length} SELESAI
+              </div>
+            </div>
 
-      {/* Progress Bar Visual */}
-      <div className="mt-10 p-6 bg-gray-50/50 rounded-2xl border border-gray-100">
-        <div className="flex justify-between items-end mb-3">
-          <div>
-            <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
-              Total Capaian
-            </p>
-            <p className="text-xl font-black text-gray-900 tracking-tighter">
-              {levels.length > 0
-                ? Math.round((completedCount / levels.length) * 100)
-                : 0}
-              %
-            </p>
-          </div>
-          <p className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase tracking-widest">
-            {completedCount === levels.length ? "Completed" : "On Track"}
-          </p>
-        </div>
-        <div className="h-3 w-full bg-gray-200/50 rounded-full overflow-hidden p-0.5 shadow-inner">
-          <div
-            className="h-full bg-gradient-to-r from-blue-700 via-blue-600 to-blue-400 rounded-full transition-all duration-1000 ease-out shadow-sm"
-            style={{
-              width: `${levels.length > 0 ? (completedCount / levels.length) * 100 : 0}%`,
-            }}
-          ></div>
-        </div>
-      </div>
+            <div className="max-h-[300px] overflow-y-auto pr-2 custom-scrollbar space-y-3">
+              {levels.length > 0 ? (
+                levels
+                  .sort((a: any, b: any) => {
+                    const aDone = completedFromProfile.includes(Number(a.id)) || a.is_completed === true || a.is_completed === 1;
+                    const bDone = completedFromProfile.includes(Number(b.id)) || b.is_completed === true || b.is_completed === 1;
+                    if (aDone === bDone) return 0;
+                    return aDone ? 1 : -1; // Tugas belum selesai naik ke atas
+                  })
+                  .map((level: any, index: number) => {
+                    const isDone = completedFromProfile.includes(Number(level.id)) || level.is_completed === true || level.is_completed === 1;
 
-      {/* DEBUG INFO (Hanya muncul jika progres masih 0 padahal seharusnya tidak) */}
-      {completedCount === 0 && masterCompletedIds.length > 0 && (
-        <p className="mt-4 text-[9px] text-red-400 font-bold uppercase text-center italic">
-          Data mismatch detected. Re-syncing with server...
-        </p>
-      )}
+                    return (
+                      <Link
+                        key={level.id || index}
+                        to={`/courses/${course.id}`}
+                        className={`group flex items-center justify-between p-4 rounded-2xl transition-all border ${
+                          isDone
+                            ? "bg-gray-50/50 border-gray-100 opacity-70 cursor-default"
+                            : "bg-white border-blue-50 shadow-sm hover:shadow-md hover:border-blue-300 hover:-translate-y-0.5 cursor-pointer"
+                        }`}
+                      >
+                        <div className="flex items-center space-x-4">
+                          <div
+                            className={`h-10 w-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110 ${
+                              isDone
+                                ? "bg-green-100 shadow-inner"
+                                : "bg-blue-600 shadow-lg shadow-blue-100"
+                            }`}
+                          >
+                            {isDone ? (
+                              <CheckCircle className="h-5 w-5 text-green-600" />
+                            ) : (
+                              <Play className="h-4 w-4 text-white fill-current ml-0.5" />
+                            )}
+                          </div>
+                          <div>
+                            <p
+                              className={`text-sm font-black tracking-tight ${isDone ? "text-gray-500 line-through" : "text-gray-900"}`}
+                            >
+                              {level.title || level.name || `Pertemuan ${index + 1}`}
+                            </p>
+                            <div className="flex items-center gap-2 mt-0.5">
+                              <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
+                                PERTEMUAN {index + 1}
+                              </span>
+                              {!isDone && level.deadline && (
+                                <div className="flex items-center gap-1 text-[8px] font-black text-red-500 uppercase tracking-widest bg-red-50 px-2 py-0.5 rounded-md">
+                                  <Clock size={10} />
+                                  {new Date(level.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="flex items-center gap-1.5 bg-gray-50 px-3 py-1 rounded-lg border border-gray-100 group-hover:bg-blue-50 group-hover:border-blue-100 transition-colors">
+                            <span className="text-[10px] font-black text-blue-600 uppercase tracking-tighter">
+                              +{level.xp_reward || level.points || 0} XP
+                            </span>
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })
+              ) : (
+                <div className="text-center py-10 border-2 border-dashed border-gray-100 rounded-3xl">
+                  <p className="text-[10px] font-black text-gray-300 uppercase tracking-[0.3em]">
+                    Materi Kosong
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Progress Bar Visual for this Course */}
+            <div className="mt-6 p-5 bg-gray-50/50 rounded-2xl border border-gray-100">
+              <div className="flex justify-between items-end mb-3">
+                <div>
+                  <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                    Capaian Materi
+                  </p>
+                  <p className="text-xl font-black text-gray-900 tracking-tighter">
+                    {progressPercent}%
+                  </p>
+                </div>
+                <p className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded uppercase tracking-widest">
+                  {courseCompletedCount === levels.length ? "Tuntas" : "On Track"}
+                </p>
+              </div>
+              <div className="h-2.5 w-full bg-gray-200/50 rounded-full overflow-hidden p-0.5 shadow-inner">
+                <div
+                  className="h-full bg-gradient-to-r from-blue-700 via-blue-600 to-blue-400 rounded-full transition-all duration-1000 ease-out shadow-sm"
+                  style={{
+                    width: `${progressPercent}%`,
+                  }}
+                ></div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
