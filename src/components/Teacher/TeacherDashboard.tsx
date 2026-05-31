@@ -86,7 +86,7 @@ export function TeacherDashboard({
   }, []);
 
   return (
-    <div className="w-full space-y-8 pb-10 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm flex flex-col">
+    <div className="w-full space-y-8 pb-10 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm flex flex-col min-h-screen">
       {/* COMPACT HEADER SECTION */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 shrink-0 bg-gray-50/50 p-6 md:p-8 rounded-[2rem] border border-gray-100/50">
         <div className="flex items-center gap-4">

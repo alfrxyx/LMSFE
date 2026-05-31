@@ -58,7 +58,7 @@ export function AdminSettings() {
   ];
 
   return (
-    <div className="w-full min-h-[80vh] space-y-8 p-4 md:p-8 bg-white rounded-xl border border-gray-100 flex flex-col">
+    <div className="w-full min-h-[80vh] space-y-8 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm flex flex-col">
       <div>
         <h1 className="text-4xl font-black text-gray-900 tracking-tight flex items-center gap-3 uppercase">
           Platform Settings <SettingsIcon className="h-10 w-10 text-blue-600" />

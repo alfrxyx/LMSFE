@@ -18,6 +18,7 @@ import {
   Award,
   Activity,
   ChevronRight,
+  Bell,
 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useApp } from "../../contexts/AppContext";
@@ -82,8 +83,41 @@ export function ContentManagement() {
     activity_type: "checklist",
     youtube_id: "",
     order: 1,
+    deadline: "",
     sendAnnouncement: true, // Default true untuk materi baru
   });
+
+  // --- MATERIAL STATS MODAL STATES ---
+  const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
+  const [materialStats, setMaterialStats] = useState<any>(null);
+  const [statsLoading, setStatsLoading] = useState(false);
+  const [nudgingId, setNudgingId] = useState<number | null>(null);
+
+  const fetchMaterialStats = async (levelId: number) => {
+    try {
+      setStatsLoading(true);
+      setIsStatsModalOpen(true);
+      const res = await api.get(`/teacher/levels/${levelId}/stats`);
+      setMaterialStats(res.data);
+    } catch (e) {
+      toast.error("Gagal memuat statistik materi");
+      setIsStatsModalOpen(false);
+    } finally {
+      setStatsLoading(false);
+    }
+  };
+
+  const handleNudge = async (userId: number, levelId: number) => {
+    try {
+      setNudgingId(userId);
+      await api.post('/teacher/remind-student', { user_id: userId, level_id: levelId });
+      toast.success("Email pengingat berhasil dikirim!");
+    } catch (e) {
+      toast.error("Gagal mengirim pengingat");
+    } finally {
+      setNudgingId(null);
+    }
+  };
   const [pdfFile, setPdfFile] = useState<File | null>(null);
 
   // --- QUIZ BUILDER STATES ---
@@ -300,6 +334,8 @@ export function ContentManagement() {
       activity_type: "checklist",
       youtube_id: "",
       order: nextOrder,
+      deadline: "",
+      sendAnnouncement: true,
     });
     setIsEditLevelMode(false);
     setIsLevelModalOpen(true);
@@ -331,7 +367,7 @@ export function ContentManagement() {
   ];
 
   return (
-    <div className="space-y-8 p-4 md:p-8 bg-white rounded-xl border border-gray-100">
+    <div className="space-y-8 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
         <div>
           <h1 className="text-4xl font-black text-gray-900 tracking-tight flex items-center gap-3">
@@ -1107,6 +1143,24 @@ export function ContentManagement() {
                         />
                       </div>
                     </div>
+                    {/* INPUT DEADLINE */}
+                    <div>
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">
+                        Batas Waktu (Deadline)
+                      </label>
+                      <input
+                        type="datetime-local"
+                        className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-blue-500 focus:bg-white transition-all font-bold outline-none"
+                        value={levelForm.deadline}
+                        onChange={(e) =>
+                          setLevelForm({
+                            ...levelForm,
+                            deadline: e.target.value,
+                          })
+                        }
+                      />
+                      <p className="text-[9px] text-gray-400 mt-2 italic ml-1">Sistem akan mengirim email pengingat otomatis pada H-1 deadline.</p>
+                    </div>
                   </div>
                   <div className="space-y-6">
                     <div>
@@ -1251,6 +1305,12 @@ export function ContentManagement() {
                         </div>
                         <div className="flex items-center gap-3">
                           <button
+                            onClick={() => fetchMaterialStats(lvl.id)}
+                            className="flex items-center gap-2 px-4 py-3 bg-blue-50 text-blue-600 rounded-2xl hover:bg-blue-600 hover:text-white transition-all font-black text-[10px] uppercase tracking-widest border border-blue-100"
+                          >
+                            <Activity size={14} /> STATS
+                          </button>
+                          <button
                             onClick={() => {
                               setSelectedLevelId(lvl.id);
                               setLevelForm({
@@ -1260,6 +1320,7 @@ export function ContentManagement() {
                                 activity_type: lvl.activity_type,
                                 youtube_id: lvl.youtube_id || "",
                                 order: lvl.order,
+                                deadline: lvl.deadline ? lvl.deadline.substring(0, 16) : "",
                                 sendAnnouncement: false, // Default false saat edit agar tidak spam
                               });
                               setIsEditLevelMode(true);
@@ -1299,6 +1360,92 @@ export function ContentManagement() {
                 >
                   TAMBAH PERTEMUAN BARU
                 </button>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
+
+      {isStatsModalOpen &&
+        createPortal(
+          <div className="fixed inset-0 z-[10000] flex items-center justify-center p-6 md:p-8 bg-gray-900/90 backdrop-blur-xl animate-in fade-in duration-300">
+            <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[85vh] relative border border-white/20 pointer-events-auto">
+              <div className="p-8 bg-gray-900 text-white flex justify-between items-center shrink-0">
+                <div className="flex items-center gap-4">
+                  <div className="h-12 w-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white">
+                    <Activity size={24} />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-black uppercase tracking-tight">Statistik Penyelesaian</h3>
+                    <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Materi: {materialStats?.level?.title}</p>
+                  </div>
+                </div>
+                <button onClick={() => setIsStatsModalOpen(false)} className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-all">
+                  <X size={20} />
+                </button>
+              </div>
+
+              {statsLoading ? (
+                <div className="p-20 text-center flex flex-col items-center gap-4">
+                   <div className="h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                   <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Memuat Statistik Materi...</p>
+                </div>
+              ) : (
+                <div className="overflow-y-auto flex-1">
+                  {/* Stats Overview */}
+                  <div className="grid grid-cols-3 divide-x divide-gray-100 bg-gray-50 border-b border-gray-100">
+                    <div className="p-6 text-center">
+                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total</p>
+                       <p className="text-2xl font-black text-gray-900">{materialStats?.stats?.total}</p>
+                    </div>
+                    <div className="p-6 text-center">
+                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Selesai</p>
+                       <p className="text-2xl font-black text-green-600">{materialStats?.stats?.completed_count}</p>
+                    </div>
+                    <div className="p-6 text-center">
+                       <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Tertunda</p>
+                       <p className="text-2xl font-black text-red-600">{materialStats?.stats?.pending_count}</p>
+                    </div>
+                  </div>
+
+                  {/* List Students */}
+                  <div className="p-8 space-y-6">
+                    <h4 className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Daftar Mahasiswa Belum Selesai ({materialStats?.stats?.pending_count})</h4>
+                    <div className="space-y-3">
+                      {materialStats?.pending_users?.map((st: any) => (
+                        <div key={st.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl border border-gray-100 group hover:bg-white hover:shadow-lg transition-all">
+                           <div className="flex items-center gap-4">
+                              <div className="h-10 w-10 rounded-xl bg-white flex items-center justify-center border border-gray-200 overflow-hidden text-blue-600 font-bold">
+                                {st.avatar ? <img src={st.avatar} className="h-full w-full object-cover" /> : st.name[0]}
+                              </div>
+                              <div>
+                                <p className="text-xs font-black text-gray-900 uppercase">{st.name}</p>
+                                <p className="text-[9px] text-gray-400 font-bold uppercase tracking-widest">NIM: {st.nim}</p>
+                              </div>
+                           </div>
+                           <button 
+                             onClick={() => handleNudge(st.id, materialStats.level.id)}
+                             disabled={nudgingId === st.id}
+                             className="p-2.5 bg-white text-gray-400 hover:text-blue-600 rounded-xl hover:shadow-md transition-all border border-gray-100 disabled:opacity-50"
+                             title="Kirim Email Pengingat"
+                           >
+                              {nudgingId === st.id ? <Loader2 size={16} className="animate-spin" /> : <Bell size={16} />}
+                           </button>
+                        </div>
+                      ))}
+                      {materialStats?.pending_users?.length === 0 && (
+                        <div className="py-10 text-center">
+                           <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto mb-3" />
+                           <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Semua mahasiswa sudah selesai!</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              <div className="p-6 bg-gray-50 border-t border-gray-100 flex justify-center shrink-0">
+                 <p className="text-[9px] text-gray-400 font-medium italic">Klik ikon lonceng untuk mengirim pengingat personal ke email mahasiswa.</p>
               </div>
             </div>
           </div>,

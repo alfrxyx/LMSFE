@@ -78,7 +78,7 @@ export function Leaderboard() {
   }
 
   return (
-    <div className="space-y-8 p-4 md:p-8 lg:p-8 bg-white rounded-xl border border-1">
+    <div className="space-y-8 p-4 md:p-8 lg:p-8 bg-white rounded-xl border border-gray-100 shadow-sm">
       {/* Header Section */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>

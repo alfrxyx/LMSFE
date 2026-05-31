@@ -1,6 +1,6 @@
 import React from "react";
 import { useApp } from "../../contexts/AppContext";
-import { CheckCircle, Play, Loader2, AlertCircle } from "lucide-react";
+import { CheckCircle, Play, Loader2, AlertCircle, Clock } from "lucide-react";
 
 export function ProgressOverview({ userData }: { userData: any }) {
   const { courses, isLoading: appLoading } = useApp();
@@ -102,6 +102,12 @@ export function ProgressOverview({ userData }: { userData: any }) {
                       <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
                         PERTEMUAN {index + 1}
                       </span>
+                      {!isDone && level.deadline && (
+                        <div className="flex items-center gap-1 text-[8px] font-black text-red-500 uppercase tracking-widest bg-red-50 px-2 py-0.5 rounded-md">
+                          <Clock size={10} />
+                          {new Date(level.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

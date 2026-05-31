@@ -337,7 +337,7 @@ export function CourseDetail() {
  }
 
  return (
- <div className="space-y-8 p-4 md:p-8 bg-white rounded-xl border border-gray-100">
+ <div className="space-y-8 p-4 md:p-8 bg-white rounded-xl border border-gray-100 shadow-sm">
  
  {/* LEVEL UP MODAL CELEBRATION */}
  {showLevelUp && createPortal(
@@ -503,11 +503,24 @@ export function CourseDetail() {
  <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-gray-50 pb-8">
  <div className="flex items-center gap-4">
  <div className="p-3 bg-blue-600 text-white rounded-2xl shadow-lg shadow-blue-100">
- <Play size={20} fill="currentColor" />
+   <Play size={20} fill="currentColor" />
  </div>
  <div>
- <h2 className="text-2xl font-black text-gray-900 tracking-tight">{activeLevel.title}</h2>
- <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1">Modul Pembelajaran PJKR</p>
+   <h2 className="text-2xl font-black text-gray-900 tracking-tight">{activeLevel.title}</h2>
+   <div className="flex items-center gap-3 mt-1">
+     <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Modul Pembelajaran PJKR</p>
+     {activeLevel.deadline && (
+       <>
+         <span className="text-gray-200">|</span>
+         <div className="flex items-center gap-1.5 text-red-500">
+           <Clock size={12} className="mb-0.5" />
+           <p className="text-[10px] font-black uppercase tracking-widest">
+             Batas: {new Date(activeLevel.deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+           </p>
+         </div>
+       </>
+     )}
+   </div>
  </div>
  </div>
  

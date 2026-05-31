@@ -53,7 +53,7 @@ export function CourseList() {
   }
 
   return (
-    <div className="space-y-6 p-4 md:p-8 bg-white rounded-xl border border-1">
+    <div className="space-y-6 p-4 md:p-8 bg-white rounded-xl border border-gray-100 shadow-sm">
       {/* HEADER: Radius dikurangi menjadi rounded-xl */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-gray-100 pb-8">
         <div>

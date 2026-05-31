@@ -102,7 +102,7 @@ export function Analytics() {
  const metrics = liveAnalyticsData.detailedMetrics; // Menggunakan data live
 
  return (
- <div className="space-y-8">
+   <div className="space-y-8 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm">
  {/* Header dan Filter */}
  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
  <div>
