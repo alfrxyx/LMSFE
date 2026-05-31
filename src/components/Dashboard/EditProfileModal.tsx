@@ -9,6 +9,7 @@ import {
   Save,
   Loader2,
   Sparkles,
+  User,
 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import api from "../../api/axios";
