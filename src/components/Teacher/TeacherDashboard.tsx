@@ -28,6 +28,7 @@ import {
 import { useAuth } from "../../contexts/AuthContext";
 import { StudentMonitoring } from "./StudentMonitoring";
 import { toast } from "sonner";
+import { GradingModal } from "./GradingModal";
 
 export function TeacherDashboard({
   tab = "overview",
@@ -80,40 +81,40 @@ export function TeacherDashboard({
       setLoading(false);
     }
   };
+useEffect(() => {
+  fetchDashboardData();
+}, []);
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
-
-  return (
-    <div className="w-full space-y-8 pb-10 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm flex flex-col min-h-screen">
-      {/* COMPACT HEADER SECTION */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 shrink-0 bg-gray-50/50 p-6 md:p-8 rounded-[2rem] border border-gray-100/50">
-        <div className="flex items-center gap-4">
-          <div className="h-12 w-12 bg-white rounded-2xl flex items-center justify-center text-blue-600 shadow-sm border border-gray-100">
-            <LayoutDashboard size={24} />
+return (
+  <div className="w-full flex flex-col gap-10 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm min-h-screen">
+      {/* HEADER SECTION */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 bg-[#0F172A] p-10 rounded-[2.5rem] text-white relative overflow-hidden shrink-0 shadow-2xl shadow-blue-900/10">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/20 rounded-full blur-[100px] -mr-32 -mt-32"></div>
+        <div className="flex items-center gap-6 relative z-10">
+          <div className="h-16 w-16 bg-blue-600 rounded-[1.75rem] flex items-center justify-center shadow-xl shadow-blue-900/50 rotate-3">
+             <LayoutDashboard size={32} />
           </div>
           <div>
-            <h1 className="text-xl font-black text-gray-900 tracking-tight leading-none">
-              Dashboard analysis
+            <h1 className="text-4xl font-black text-white tracking-tight uppercase leading-none">
+              Teacher Panel
             </h1>
-            <p className="text-[10px] text-gray-400 font-bold tracking-widest mt-1">Analysis Control Center</p>
+            <p className="text-blue-400 font-bold uppercase text-[10px] tracking-[0.2em] mt-2 italic">Analysis & Grading Control Center</p>
           </div>
         </div>
 
         {/* TAB NAVIGATION (MATCHING COMPACT STYLE) */}
-        <div className="flex bg-white/50 p-1.5 rounded-2xl shadow-sm border border-gray-100">
+        <div className="relative z-10 flex bg-white/10 backdrop-blur-md p-1.5 rounded-2xl border border-white/10">
           {teacherTabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 ${
+              className={`px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-3 ${
                 activeTab === tab.id
-                  ? "bg-blue-600 text-white shadow-lg shadow-blue-100"
-                  : "text-gray-400 hover:text-gray-600 hover:bg-white"
+                  ? "bg-white text-gray-900 shadow-xl scale-105"
+                  : "text-white/60 hover:text-white hover:bg-white/5"
               }`}
             >
-              <tab.icon className="h-3.5 w-3.5" />
+              <tab.icon size={16} />
               <span>{tab.name}</span>
             </button>
           ))}
@@ -232,6 +233,10 @@ function SubmissionsPanel({ onGradeComplete }: any) {
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
+  // Grading Modal States
+  const [selectedSubmission, setSelectedSubmission] = useState<any | null>(null);
+  const [isGradingModalOpen, setIsGradingModalOpen] = useState(false);
+  
   const fetchSubmissions = async () => {
     try {
       setLoading(true);
@@ -247,23 +252,49 @@ function SubmissionsPanel({ onGradeComplete }: any) {
   return (
     <div className="p-8 space-y-8">
       <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight">Antrean Penilaian ({submissions.length})</h3>
-      <div className="divide-y divide-gray-100 border border-gray-100 rounded-[2.5rem] overflow-hidden">
+      <div className="divide-y divide-gray-100 border border-gray-100 rounded-[2.5rem] overflow-hidden shadow-sm">
         {submissions.map(sub => (
           <div key={sub.id} className="p-6 flex items-center justify-between gap-6 bg-white hover:bg-gray-50 transition-colors">
             <div className="flex items-center gap-5">
               <div className="h-16 w-16 rounded-[1.5rem] bg-gray-100 flex items-center justify-center overflow-hidden border border-gray-200 font-bold text-gray-400">
-                {sub.user.avatar ? <img src={sub.user.avatar} className="h-full w-full object-cover" /> : sub.user.name[0]}
+                {sub.user?.avatar ? <img src={sub.user.avatar} className="h-full w-full object-cover" /> : sub.user?.name[0]}
               </div>
               <div>
-                <p className="font-black text-gray-900 uppercase text-sm tracking-tight">{sub.user.name}</p>
+                <p className="font-black text-gray-900 uppercase text-sm tracking-tight">{sub.user?.name}</p>
                 <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">{sub.level?.title}</p>
               </div>
             </div>
-            <button className="px-8 py-3 bg-blue-600 text-white text-[10px] font-black rounded-2xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 uppercase tracking-widest">NILAI SEKARANG</button>
+            <button 
+              onClick={() => {
+                setSelectedSubmission(sub);
+                setIsGradingModalOpen(true);
+              }}
+              className="px-8 py-3 bg-blue-600 text-white text-[10px] font-black rounded-2xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 uppercase tracking-widest active:scale-95"
+            >
+              NILAI SEKARANG
+            </button>
           </div>
         ))}
-        {submissions.length === 0 && <div className="py-20 text-center text-gray-400 text-sm font-bold uppercase tracking-widest">Antrean Kosong</div>}
+        {submissions.length === 0 && (
+          <div className="py-24 text-center">
+             <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto mb-4" />
+             <p className="text-gray-400 text-sm font-black uppercase tracking-widest">Semua Tugas Sudah Dinilai!</p>
+          </div>
+        )}
       </div>
+
+      <GradingModal 
+        isOpen={isGradingModalOpen}
+        submission={selectedSubmission}
+        onClose={() => {
+          setIsGradingModalOpen(false);
+          setSelectedSubmission(null);
+        }}
+        onSuccess={() => {
+          fetchSubmissions();
+          onGradeComplete();
+        }}
+      />
     </div>
   );
 }

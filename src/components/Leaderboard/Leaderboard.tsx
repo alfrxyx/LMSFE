@@ -78,14 +78,14 @@ export function Leaderboard() {
   }
 
   return (
-    <div className="space-y-8 p-4 md:p-8 lg:p-8 bg-white rounded-xl border border-gray-100 shadow-sm">
+    <div className="w-full flex flex-col gap-10 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm min-h-screen">
       {/* Header Section */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 bg-gray-50/50 p-8 rounded-[2.5rem] border border-gray-100/50 shrink-0">
         <div>
-          <h1 className="text-4xl font-black text-gray-900 tracking-tight flex items-center gap-3">
+          <h1 className="text-4xl font-black text-gray-900 tracking-tight flex items-center gap-3 leading-none">
             Leaderboard <Trophy className="h-10 w-10 text-yellow-500" />
           </h1>
-          <p className="mt-2 text-gray-500 font-medium italic">Siapa mahasiswa PJKR dengan poin XP tertinggi hari ini?</p>
+          <p className="mt-3 text-gray-500 font-medium italic">Siapa mahasiswa PJKR dengan poin XP tertinggi hari ini?</p>
         </div>
 
         <div className="flex flex-col md:flex-row gap-4">

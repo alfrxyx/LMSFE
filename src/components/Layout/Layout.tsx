@@ -35,8 +35,10 @@ export function Layout({ children }: LayoutProps) {
  {/* Header tetap di atas - Ditambah prop onMenuClick */}
  <Header onMenuClick={() => setIsMobileSidebarOpen(true)} />
  
- <main className="flex-1 p-4 md:p-8">
+ <main className="flex-1 p-4 md:p-10 overflow-x-hidden">
+ <div className="max-w-[1440px] mx-auto w-full">
  {children}
+ </div>
  </main>
  </div>
  </div>

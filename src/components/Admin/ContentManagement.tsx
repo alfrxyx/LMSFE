@@ -367,8 +367,8 @@ export function ContentManagement() {
   ];
 
   return (
-    <div className="space-y-8 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm">
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+    <div className="w-full flex flex-col gap-10 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm min-h-screen">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 bg-gray-50/50 p-8 rounded-[2.5rem] border border-gray-100/50 shrink-0">
         <div>
           <h1 className="text-4xl font-black text-gray-900 tracking-tight flex items-center gap-3">
             Content Management <FileText className="h-10 w-10 text-blue-600" />
@@ -1160,6 +1160,40 @@ export function ContentManagement() {
                         }
                       />
                       <p className="text-[9px] text-gray-400 mt-2 italic ml-1">Sistem akan mengirim email pengingat otomatis pada H-1 deadline.</p>
+                    </div>
+
+                    {/* INPUT PDF MODUL (OPSIONAL) */}
+                    <div>
+                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 block">
+                        Modul Materi PDF (Opsional)
+                      </label>
+                      <div className="relative group cursor-pointer">
+                        <input
+                          type="file"
+                          accept=".pdf"
+                          className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                          onChange={(e) => {
+                            if (e.target.files?.[0]) {
+                              setPdfFile(e.target.files[0]);
+                            }
+                          }}
+                        />
+                        <div className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 group-hover:border-blue-400 flex items-center justify-center gap-3 transition-all">
+                          <Upload size={18} className="text-gray-400 group-hover:text-blue-600" />
+                          <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest group-hover:text-blue-600">
+                            {pdfFile ? pdfFile.name : "Pilih File PDF"}
+                          </span>
+                        </div>
+                      </div>
+                      {pdfFile && (
+                        <button 
+                          type="button"
+                          onClick={() => setPdfFile(null)}
+                          className="mt-2 text-[8px] font-black text-red-500 uppercase tracking-widest hover:underline ml-1"
+                        >
+                          Hapus File
+                        </button>
+                      )}
                     </div>
                   </div>
                   <div className="space-y-6">

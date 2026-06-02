@@ -52,9 +52,9 @@ export function StudentManagement() {
  }
 
  return (
- <div className="space-y-8 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm">
+ <div className="w-full flex flex-col gap-10 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm min-h-screen">
  {/* Header & Button Tambah */}
- <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+ <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 bg-gray-50/50 p-8 rounded-[2.5rem] border border-gray-100/50 shrink-0">
  <div className="flex items-center gap-4">
  <div className="p-4 bg-blue-600 rounded-[2rem] shadow-xl shadow-blue-100">
  <Users className="h-8 w-8 text-white" />

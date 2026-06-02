@@ -58,14 +58,17 @@ export function AdminSettings() {
   ];
 
   return (
-    <div className="w-full min-h-[80vh] space-y-8 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm flex flex-col">
-      <div>
-        <h1 className="text-4xl font-black text-gray-900 tracking-tight flex items-center gap-3 uppercase">
-          Platform Settings <SettingsIcon className="h-10 w-10 text-blue-600" />
-        </h1>
-        <p className="mt-2 text-gray-500 font-medium italic">
-          Konfigurasi preferensi platform dan konten dashboard PJKR UM.
-        </p>
+    <div className="w-full flex flex-col gap-10 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm min-h-screen">
+      <div className="bg-[#0F172A] p-10 rounded-[2.5rem] text-white relative overflow-hidden shrink-0 shadow-2xl shadow-blue-900/10">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/20 rounded-full blur-[100px] -mr-32 -mt-32"></div>
+        <div className="relative z-10">
+          <h1 className="text-4xl font-black tracking-tight flex items-center gap-3 uppercase">
+            Platform Settings <SettingsIcon className="h-10 w-10 text-blue-500" />
+          </h1>
+          <p className="mt-2 text-blue-300 text-sm font-medium italic">
+            Konfigurasi preferensi platform dan konten dashboard PJKR UM.
+          </p>
+        </div>
       </div>
 
       {isLoading ? (

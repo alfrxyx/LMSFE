@@ -94,8 +94,8 @@ export function AdminDashboard() {
     };
 
     return (
-        <div className="space-y-8 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <div className="w-full flex flex-col gap-10 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm min-h-screen">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-8 bg-gray-50/50 p-8 rounded-[2.5rem] border border-gray-100/50 shrink-0">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
                     <p className="mt-2 text-gray-600">

@@ -58,11 +58,13 @@ export function StudentBySemester() {
   }
 
   return (
-    <div className="space-y-8 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div className="w-full flex flex-col gap-10 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm min-h-screen">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-gray-50/50 p-8 rounded-[2.5rem] border border-gray-100/50 shrink-0">
         <div>
-          <h1 className="text-3xl font-black text-gray-900 tracking-tight uppercase">Daftar Mahasiswa</h1>
-          <p className="text-gray-500 font-medium text-sm mt-1">Data seluruh mahasiswa terdaftar berdasarkan semester.</p>
+          <h1 className="text-4xl font-black text-gray-900 tracking-tight uppercase flex items-center gap-3">
+            Daftar Mahasiswa <Users className="h-10 w-10 text-blue-600" />
+          </h1>
+          <p className="text-gray-500 font-medium italic mt-1">Data seluruh mahasiswa terdaftar berdasarkan angkatan semester.</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">

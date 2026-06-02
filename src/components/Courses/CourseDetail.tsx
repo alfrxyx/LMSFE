@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useParams, Link } from 'react-router-dom';
 import api from '../../api/axios';
 import { 
@@ -23,15 +24,31 @@ const getYouTubeID = (url: string) => {
 // COMPONENT: EvaluationDetail
 // =======================================================
 function EvaluationDetail({ level, onClose }: { level: any, onClose: () => void }) {
-  // Parse rubric if exists in feedback
-  const rubricMatch = level.feedback?.match(/\[RUBRIK\] Prep: (\d)\/5, Exec: (\d)\/5, Follow: (\d)\/5/);
-  const rubric = rubricMatch ? {
-    prep: parseInt(rubricMatch[1]),
-    exec: parseInt(rubricMatch[2]),
-    follow: parseInt(rubricMatch[3])
-  } : null;
+  // Parse rubric data from the new formatted feedback string
+  let rubric = null;
+  let cleanFeedback = level.feedback || '';
 
-  const cleanFeedback = level.feedback?.replace(/\[RUBRIK\].*?\./, '').trim();
+  if (level.feedback && level.feedback.includes('RUBRIC_DATA:')) {
+    try {
+      const parts = level.feedback.split('|FEEDBACK:');
+      const jsonStr = parts[0].replace('RUBRIC_DATA:', '');
+      rubric = JSON.parse(jsonStr);
+      cleanFeedback = parts[1] || '';
+    } catch (e) {
+      console.error("Error parsing rubric:", e);
+    }
+  } else {
+    // Fallback for old format
+    const rubricMatch = level.feedback?.match(/\[RUBRIK\] Prep: (\d)\/5, Exec: (\d)\/5, Follow: (\d)\/5/);
+    if (rubricMatch) {
+      rubric = {
+        prep: parseInt(rubricMatch[1]),
+        exec: parseInt(rubricMatch[2]),
+        follow: parseInt(rubricMatch[3])
+      };
+      cleanFeedback = level.feedback?.replace(/\[RUBRIK\].*?\./, '').trim();
+    }
+  }
 
   return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/90 backdrop-blur-xl animate-in fade-in duration-300">
@@ -146,6 +163,7 @@ export function CourseDetail() {
  // Form Task (Hanya Link YouTube)
  const [youtubeLink, setYoutubeLink] = useState('');
  const [submitting, setSubmitting] = useState(false);
+ const [pdfOpened, setPdfOpened] = useState(false);
 
  // Modal Evaluation Detail
  const [showEvalDetail, setShowEvalDetail] = useState(false);
@@ -224,6 +242,7 @@ export function CourseDetail() {
    }
 
    setActiveLevel(level);
+   setPdfOpened(false); // Reset status PDF setiap ganti level
    setQuizAnswers({});
    setQuizSubmitted(false);
    setQuizScore(0);
@@ -337,7 +356,7 @@ export function CourseDetail() {
  }
 
  return (
- <div className="space-y-8 p-4 md:p-8 bg-white rounded-xl border border-gray-100 shadow-sm">
+ <div className="w-full flex flex-col gap-8 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm min-h-screen">
  
  {/* LEVEL UP MODAL CELEBRATION */}
  {showLevelUp && createPortal(
@@ -529,9 +548,10 @@ export function CourseDetail() {
  href={`${API_STORAGE_URL}/storage/${activeLevel.pdf_path}`}
  target="_blank"
  rel="noopener noreferrer"
- className="flex items-center gap-3 text-[10px] font-black text-blue-600 bg-blue-50 px-6 py-3 rounded-2xl hover:bg-blue-600 hover:text-white transition-all shadow-sm border border-blue-100"
+ onClick={() => setPdfOpened(true)}
+ className={`flex items-center gap-3 text-[10px] font-black px-6 py-3 rounded-2xl transition-all shadow-sm border ${pdfOpened ? 'bg-green-50 text-green-600 border-green-100' : 'bg-blue-50 text-blue-600 border-blue-100 hover:bg-blue-600 hover:text-white'}`}
  >
- <FileText className="h-4 w-4" /> BUKA MODUL PDF
+ <FileText className="h-4 w-4" /> {pdfOpened ? 'MODUL PDF SUDAH DIBUKA' : 'BUKA MODUL PDF'}
  </a>
  )}
  </div>
@@ -544,17 +564,34 @@ export function CourseDetail() {
 
  {/* FEEDBACK AREA */}
  {activeLevel.is_completed && activeLevel.feedback && (
- <div className="bg-blue-50/50 rounded-[2rem] p-8 border border-blue-100 flex gap-6">
- <div className="h-12 w-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-blue-100">
- <MessageSquare size={24} />
- </div>
- <div>
- <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2">Evaluasi Dosen</p>
- <p className="text-gray-900 font-bold text-lg leading-relaxed italic">
- "{activeLevel.feedback}"
- </p>
- </div>
- </div>
+   <div className="bg-blue-50/50 rounded-[2rem] p-8 border border-blue-100 flex flex-col gap-6">
+     <div className="flex items-center justify-between">
+       <div className="flex items-center gap-4">
+         <div className="h-12 w-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-blue-100">
+           <MessageSquare size={24} />
+         </div>
+         <div>
+           <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-1">Evaluasi Dosen</p>
+           <h4 className="text-sm font-black text-gray-900 uppercase">Tugas Telah Diverifikasi</h4>
+         </div>
+       </div>
+       <button 
+         onClick={() => setShowEvalDetail(true)}
+         className="px-6 py-2.5 bg-white text-blue-600 border border-blue-100 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+       >
+         Lihat Detail Rubrik
+       </button>
+     </div>
+     
+     <p className="text-gray-900 font-bold text-lg leading-relaxed italic border-l-4 border-blue-200 pl-6 py-1">
+       "{(() => {
+          if (activeLevel.feedback.includes('|FEEDBACK:')) {
+            return activeLevel.feedback.split('|FEEDBACK:')[1];
+          }
+          return activeLevel.feedback.replace(/\[RUBRIK\].*?\./, '').trim();
+       })()}"
+     </p>
+   </div>
  )}
  </div>
 
@@ -627,10 +664,10 @@ export function CourseDetail() {
  ))}
  <button 
  onClick={handleQuizSubmit}
- disabled={Object.keys(quizAnswers).length < (activeLevel.questions?.length || 0) || !isPreviousLevelCompleted()}
+ disabled={Object.keys(quizAnswers).length < (activeLevel.questions?.length || 0) || !isPreviousLevelCompleted() || (activeLevel.pdf_path && !pdfOpened)}
  className="w-full bg-blue-600 text-white py-6 rounded-[2.5rem] font-black text-xs uppercase tracking-widest shadow-2xl shadow-blue-100 hover:bg-blue-700 disabled:bg-gray-200 transition-all active:scale-95 flex items-center justify-center gap-3"
  >
- <Send size={18} /> {!isPreviousLevelCompleted() ? "BELUM BISA KIRIM KUIS" : "Kirim Jawaban Kuis"}
+ <Send size={18} /> {!(activeLevel.pdf_path && !pdfOpened) ? (!isPreviousLevelCompleted() ? "BELUM BISA KIRIM KUIS" : "Kirim Jawaban Kuis") : "BACA MODUL PDF DAHULU"}
  </button>
  </div>
  ) : (
@@ -713,11 +750,11 @@ export function CourseDetail() {
  </div>
  </div>
  <button 
- disabled={submitting || !youtubeLink || !isPreviousLevelCompleted()}
+ disabled={submitting || !youtubeLink || !isPreviousLevelCompleted() || (activeLevel.pdf_path && !pdfOpened)}
  className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-gray-800 disabled:text-gray-500 py-6 rounded-[2rem] font-black text-sm uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-4 shadow-2xl shadow-blue-900/50"
  >
  {submitting ? <Loader2 className="animate-spin h-5 w-5" /> : <Send className="h-5 w-5" />}
- {submitting ? "MENGIRIM TUGAS..." : !isPreviousLevelCompleted() ? "BELUM BISA DIKIRIM" : "KIRIM & KLAIM XP"}
+ {submitting ? "MENGIRIM TUGAS..." : (activeLevel.pdf_path && !pdfOpened ? "BACA MODUL PDF DAHULU" : (!isPreviousLevelCompleted() ? "BELUM BISA DIKIRIM" : "KIRIM & KLAIM XP"))}
  </button>
  </form>
  )}
@@ -746,17 +783,19 @@ export function CourseDetail() {
  <div className="max-w-sm mx-auto space-y-4">
  <button 
  onClick={() => handleSubmitTask(undefined, true)}
- disabled={submitting || activeLevel.is_completed || !isPreviousLevelCompleted()}
+ disabled={submitting || activeLevel.is_completed || !isPreviousLevelCompleted() || (activeLevel.pdf_path && !pdfOpened)}
  className={`w-full py-6 rounded-[2.5rem] font-black text-xs uppercase tracking-widest transition-all flex items-center justify-center gap-4 ${
  activeLevel.is_completed 
  ? 'bg-gray-50 text-gray-400 cursor-not-allowed border-2 border-gray-100' 
- : !isPreviousLevelCompleted()
+ : (!isPreviousLevelCompleted() || (activeLevel.pdf_path && !pdfOpened))
  ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
  : 'bg-green-600 hover:bg-green-700 text-white shadow-2xl shadow-green-100 active:scale-95'
  }`}
  >
  {activeLevel.is_completed ? (
  <><CheckCircle size={20} /> MATERI TERVERIFIKASI</>
+ ) : (activeLevel.pdf_path && !pdfOpened) ? (
+ <>BACA MODUL PDF DAHULU</>
  ) : !isPreviousLevelCompleted() ? (
  <>BELUM BISA DISELESAIKAN</>
  ) : (

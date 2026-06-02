@@ -102,9 +102,9 @@ export function Analytics() {
  const metrics = liveAnalyticsData.detailedMetrics; // Menggunakan data live
 
  return (
-   <div className="space-y-8 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm">
+   <div className="w-full flex flex-col gap-10 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm min-h-screen">
  {/* Header dan Filter */}
- <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+ <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 bg-gray-50/50 p-8 rounded-[2.5rem] border border-gray-100/50 shrink-0">
  <div>
  <h1 className="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
  <p className="mt-2 text-gray-600">

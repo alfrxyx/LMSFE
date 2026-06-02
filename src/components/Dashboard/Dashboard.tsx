@@ -68,10 +68,9 @@ export function Dashboard() {
   const displayUser = authUser;
 
   return (
-    <div className="w-full space-y-6 md:space-y-8 pb-10 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm">
-
+    <div className="w-full flex flex-col gap-6 md:gap-8 pb-10 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm min-h-screen">
       {/* HEADER SECTION - Status Ribbon */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-gray-50/50 p-6 md:p-8 rounded-3xl md:rounded-[2.5rem] border border-gray-100/50">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-gray-50/50 p-6 md:p-8 rounded-3xl md:rounded-[2.5rem] border border-gray-100/50 shrink-0">
         <div className="flex items-center gap-4 md:gap-6">
           <div className="h-12 w-12 md:h-14 md:h-14 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg md:text-xl shadow-md overflow-hidden shrink-0">
             {displayUser?.avatar ? (
@@ -176,9 +175,9 @@ export function Dashboard() {
           </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8 items-stretch">
         {/* BANNER UTAMA: Balanced Hero Design */}
-        <div className="lg:col-span-2 relative overflow-hidden bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl p-6 md:p-10 text-white shadow-xl group border border-white/10 min-h-[260px] md:min-h-[320px] flex flex-col justify-center">
+        <div className="lg:col-span-8 relative overflow-hidden bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl p-6 md:p-10 text-white shadow-xl group border border-white/10 min-h-[260px] md:min-h-[320px] flex flex-col justify-center">
           
           {/* Efek Visual Background */}
           <div className="absolute inset-2 bg-white/5 rounded-[2.5rem] backdrop-blur-[2px] pointer-events-none"></div>
@@ -213,7 +212,9 @@ export function Dashboard() {
             </div>
           </div>
         </div>
-        <div className="uiverse-parent lg:col-span-1">
+        
+        {/* RANK CARD */}
+        <div className="uiverse-parent lg:col-span-4 h-full">
           <div className="uiverse-card bg-white rounded-3xl p-6 md:p-8 h-full shadow-xl border border-gray-50 flex flex-col justify-between overflow-hidden relative group">
             <div className="logo pointer-events-none">
               <span className="uiverse-logo-circle w-32 h-32 -top-4 -right-4 bg-blue-600/5 opacity-20 group-hover:scale-110 transition-transform duration-700"></span>

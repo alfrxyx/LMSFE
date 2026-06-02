@@ -27,7 +27,7 @@ export function Profile() {
   if (!user) return null;
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8 pb-12 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm">
+    <div className="w-full max-w-6xl mx-auto flex flex-col gap-10 pb-12 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm min-h-screen">
       {/* PREMIUM MODERN HEADER */}
       <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-xl shadow-gray-200/50 overflow-hidden transition-all duration-500">
         {/* Banner with Mesh Gradient and Organic Shapes */}
