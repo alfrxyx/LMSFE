@@ -52,10 +52,10 @@ export function Leaderboard() {
 
   const getPodiumStyle = (rank: number) => {
     switch (rank) {
-      case 1: return 'bg-gradient-to-b from-yellow-50 to-white border-yellow-200 shadow-yellow-100 scale-110 z-10';
-      case 2: return 'bg-gradient-to-b from-gray-50 to-white border-gray-200';
-      case 3: return 'bg-gradient-to-b from-amber-50 to-white border-amber-200';
-      default: return 'bg-white border-gray-100';
+      case 1: return 'bg-gradient-to-b from-yellow-50 to-white dark:from-yellow-900/20 dark:to-gray-900 border-yellow-200 dark:border-yellow-800 shadow-yellow-100 dark:shadow-none scale-110 z-10';
+      case 2: return 'bg-gradient-to-b from-gray-50 to-white dark:from-gray-800 dark:to-gray-900 border-gray-200 dark:border-gray-800';
+      case 3: return 'bg-gradient-to-b from-amber-50 to-white dark:from-amber-900/20 dark:to-gray-900 border-amber-200 dark:border-amber-800';
+      default: return 'bg-white dark:bg-gray-900 border-gray-100 dark:border-gray-800';
     }
   };
 
@@ -63,14 +63,14 @@ export function Leaderboard() {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
         <Loader2 className="h-12 w-12 text-blue-600 animate-spin" />
-        <p className="text-gray-500 font-black uppercase tracking-widest text-[10px]">Menyusun Papan Peringkat PJKR...</p>
+        <p className="text-gray-500 dark:text-gray-400 font-black uppercase tracking-widest text-[10px]">Menyusun Papan Peringkat PJKR...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-8 text-center text-red-600 bg-red-50 rounded-[2.5rem] border border-red-100 flex flex-col items-center max-w-lg mx-auto mt-10">
+      <div className="p-8 text-center text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded-[2.5rem] border border-red-100 dark:border-red-900/30 flex flex-col items-center max-w-lg mx-auto mt-10">
         <AlertCircle className="h-12 w-12 mb-4" />
         <p className="font-black uppercase tracking-tight text-lg">{error}</p>
       </div>
@@ -78,25 +78,25 @@ export function Leaderboard() {
   }
 
   return (
-    <div className="w-full flex flex-col gap-10 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm min-h-screen">
+    <div className="w-full flex flex-col gap-10 p-6 md:p-10 bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm min-h-screen transition-colors duration-300">
       {/* Header Section */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 bg-gray-50/50 p-8 rounded-[2.5rem] border border-gray-100/50 shrink-0">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 bg-gray-50/50 dark:bg-gray-800/50 p-8 rounded-[2.5rem] border border-gray-100/50 dark:border-gray-800/50 shrink-0">
         <div>
-          <h1 className="text-4xl font-black text-gray-900 tracking-tight flex items-center gap-3 leading-none">
+          <h1 className="text-4xl font-black text-gray-900 dark:text-white tracking-tight flex items-center gap-3 leading-none">
             Leaderboard <Trophy className="h-10 w-10 text-yellow-500" />
           </h1>
-          <p className="mt-3 text-gray-500 font-medium italic">Siapa mahasiswa PJKR dengan poin XP tertinggi hari ini?</p>
+          <p className="mt-3 text-gray-500 dark:text-gray-400 font-medium italic">Siapa mahasiswa PJKR dengan poin XP tertinggi hari ini?</p>
         </div>
 
         <div className="flex flex-col md:flex-row gap-4">
           {/* Semester Filter - Hanya muncul untuk Admin/Dosen */}
           {(user?.role === 'admin' || user?.role === 'dosen') && (
-            <div className="flex bg-gray-100/80 p-1.5 rounded-2xl overflow-x-auto max-w-full md:max-w-none no-scrollbar border border-gray-100 shadow-inner">
+            <div className="flex bg-gray-100/80 dark:bg-gray-800/80 p-1.5 rounded-2xl overflow-x-auto max-w-full md:max-w-none no-scrollbar border border-gray-100 dark:border-gray-700 shadow-inner">
               {['all', '1', '2', '3', '4', '5', '6', '7', '8'].map(sem => (
                 <button
                   key={`sem-${sem}`}
                   onClick={() => setSemesterFilter(sem)}
-                  className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tight transition-all whitespace-nowrap ${semesterFilter === sem ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
+                  className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tight transition-all whitespace-nowrap ${semesterFilter === sem ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'}`}
                 >
                   {sem === 'all' ? 'SEMUA' : `S${sem}`}
                 </button>
@@ -105,12 +105,12 @@ export function Leaderboard() {
           )}
 
           {/* Time Filter */}
-          <div className="flex bg-gray-100/80 p-1.5 rounded-2xl border border-gray-100 shadow-inner">
+          <div className="flex bg-gray-100/80 dark:bg-gray-800/80 p-1.5 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-inner">
             {['all', 'weekly', 'monthly'].map((opt) => (
               <button
                 key={`filter-${opt}`}
                 onClick={() => setFilter(opt as any)}
-                className={`px-5 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tight transition-all ${filter === opt ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'
+                className={`px-5 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tight transition-all ${filter === opt ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'
                   }`}
               >
                 {opt === 'all' ? 'SEMUA' : opt === 'weekly' ? 'MINGGU' : 'BULAN'}
@@ -133,8 +133,8 @@ export function Leaderboard() {
             >
               <div className="absolute -top-8 left-1/2 -translate-x-1/2">{getRankIcon(rank)}</div>
 
-              <div className="h-24 w-24 mx-auto bg-white rounded-3xl flex items-center justify-center border-4 border-white shadow-xl overflow-hidden mb-6 group">
-                <div className="h-full w-full bg-blue-50 flex items-center justify-center font-black text-3xl text-blue-600 group-hover:scale-110 transition-transform">
+              <div className="h-24 w-24 mx-auto bg-white dark:bg-gray-800 rounded-3xl flex items-center justify-center border-4 border-white dark:border-gray-800 shadow-xl overflow-hidden mb-6 group">
+                <div className="h-full w-full bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center font-black text-3xl text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
                   {entry.avatar ? (
                     <img src={entry.avatar} alt={entry.name} className="h-full w-full object-cover" />
                   ) : (
@@ -143,22 +143,22 @@ export function Leaderboard() {
                 </div>
               </div>
 
-              <h3 className="font-black text-xl text-gray-900 truncate mb-1">{entry.name}</h3>
+              <h3 className="font-black text-xl text-gray-900 dark:text-white truncate mb-1">{entry.name}</h3>
               
               {entry.bio && (
-                <p className="text-[9px] font-black text-blue-600 uppercase tracking-widest mb-3 line-clamp-1 italic px-2">
+                <p className="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-3 line-clamp-1 italic px-2">
                   "{entry.bio}"
                 </p>
               )}
 
               <div className="flex items-center justify-center gap-1.5 mb-4">
-                <Hash className="h-3 w-3 text-gray-300" />
-                <span className="text-[10px] font-black text-gray-400 tracking-widest">{entry.nim || 'NIM MAHASISWA'}</span>
+                <Hash className="h-3 w-3 text-gray-300 dark:text-gray-600" />
+                <span className="text-[10px] font-black text-gray-400 dark:text-gray-500 tracking-widest">{entry.nim || 'NIM MAHASISWA'}</span>
               </div>
 
-              <p className="text-blue-600 font-black text-4xl mt-2 tracking-tighter">
+              <p className="text-blue-600 dark:text-blue-400 font-black text-4xl mt-2 tracking-tighter">
                 {entry.points.toLocaleString()}
-                <span className="text-xs text-blue-400 ml-1">XP</span>
+                <span className="text-xs text-blue-400 dark:text-blue-500 ml-1">XP</span>
               </p>
 
               {isMe && <span className="mt-4 inline-block bg-blue-600 text-white text-[10px] px-4 py-1.5 rounded-full font-black uppercase tracking-widest">Peringkat Anda</span>}
@@ -168,11 +168,11 @@ export function Leaderboard() {
       </div>
 
       {/* FULL RANKINGS LIST */}
-      <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden max-w-5xl mx-auto">
-        <div className="px-8 py-6 border-b border-gray-50 bg-gray-50/30">
-          <h2 className="text-sm font-black text-gray-400 uppercase tracking-[0.2em]">Peringkat Seluruh Mahasiswa</h2>
+      <div className="bg-white dark:bg-gray-900 rounded-[2.5rem] shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden max-w-5xl mx-auto transition-colors duration-300">
+        <div className="px-8 py-6 border-b border-gray-50 dark:border-gray-800 bg-gray-50/30 dark:bg-gray-800/30">
+          <h2 className="text-sm font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">Peringkat Seluruh Mahasiswa</h2>
         </div>
-        <div className="divide-y divide-gray-50">
+        <div className="divide-y divide-gray-50 dark:divide-gray-800">
           {rankings.length > 0 ? (
             rankings.map((entry, index) => {
               const rank = index + 1;
@@ -180,14 +180,14 @@ export function Leaderboard() {
               return (
                 <div
                   key={`list-item-${entry.id}`}
-                  className={`flex items-center p-6 gap-6 transition-all ${isMe ? 'bg-blue-50/50 border-l-8 border-blue-600' : 'hover:bg-gray-50/80'
+                  className={`flex items-center p-6 gap-6 transition-all ${isMe ? 'bg-blue-50/50 dark:bg-blue-900/20 border-l-8 border-blue-600' : 'hover:bg-gray-50/80 dark:hover:bg-gray-800/50'
                     }`}
                 >
                   <div className="w-12 text-center flex justify-center">
-                    {rank <= 3 ? getRankIcon(rank) : <span className="font-black text-gray-300 text-lg">#{rank}</span>}
+                    {rank <= 3 ? getRankIcon(rank) : <span className="font-black text-gray-300 dark:text-gray-600 text-lg">#{rank}</span>}
                   </div>
 
-                  <div className="h-14 w-14 rounded-2xl bg-gray-100 flex-shrink-0 flex items-center justify-center font-black text-gray-400 uppercase text-xl border-2 border-white shadow-sm overflow-hidden">
+                  <div className="h-14 w-14 rounded-2xl bg-gray-100 dark:bg-gray-800 flex-shrink-0 flex items-center justify-center font-black text-gray-400 dark:text-gray-500 uppercase text-xl border-2 border-white dark:border-gray-700 shadow-sm overflow-hidden">
                     {entry.avatar ? (
                       <img src={entry.avatar} alt={entry.name} className="h-full w-full object-cover" />
                     ) : (
@@ -196,24 +196,24 @@ export function Leaderboard() {
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-black text-gray-900 text-lg leading-tight flex items-center gap-3">
+                    <h4 className="font-black text-gray-900 dark:text-white text-lg leading-tight flex items-center gap-3">
                       {entry.name}
                       {isMe && <span className="bg-blue-600 text-white text-[8px] px-3 py-1 rounded-full font-black uppercase tracking-widest">Me</span>}
                     </h4>
                     
                     {entry.bio && (
-                      <p className="text-[10px] font-bold text-blue-600/70 italic line-clamp-1 mt-0.5">
+                      <p className="text-[10px] font-bold text-blue-600/70 dark:text-blue-400/70 italic line-clamp-1 mt-0.5">
                         "{entry.bio}"
                       </p>
                     )}
 
-                    <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mt-1">Level {entry.level} • NIM {entry.nim || '-'}</p>
+                    <p className="text-[10px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest mt-1">Level {entry.level} • NIM {entry.nim || '-'}</p>
                   </div>
 
                   <div className="text-right">
-                    <p className="font-black text-blue-600 text-xl tracking-tighter">
+                    <p className="font-black text-blue-600 dark:text-blue-400 text-xl tracking-tighter">
                       {entry.points.toLocaleString()}
-                      <span className="text-[10px] text-gray-400 ml-1 uppercase">XP</span>
+                      <span className="text-[10px] text-gray-400 dark:text-gray-500 ml-1 uppercase">XP</span>
                     </p>
                   </div>
                 </div>
@@ -221,8 +221,8 @@ export function Leaderboard() {
             })
           ) : (
             <div className="py-20 text-center">
-              <Trophy className="h-16 w-16 text-gray-100 mx-auto mb-4" />
-              <p className="text-gray-400 font-black uppercase tracking-widest text-sm">Belum ada data kompetisi</p>
+              <Trophy className="h-16 w-16 text-gray-100 dark:text-gray-800 mx-auto mb-4" />
+              <p className="text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest text-sm">Belum ada data kompetisi</p>
             </div>
           )}
         </div>

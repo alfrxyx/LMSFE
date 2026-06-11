@@ -58,8 +58,8 @@ export function AdminSettings() {
   ];
 
   return (
-    <div className="w-full flex flex-col gap-10 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm min-h-screen">
-      <div className="bg-[#0F172A] p-10 rounded-[2.5rem] text-white relative overflow-hidden shrink-0 shadow-2xl shadow-blue-900/10">
+    <div className="w-full flex flex-col gap-10 p-6 md:p-10 bg-white dark:bg-gray-950 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm min-h-screen transition-colors duration-300">
+      <div className="bg-[#0F172A] dark:bg-gray-900 p-10 rounded-[2.5rem] text-white relative overflow-hidden shrink-0 shadow-2xl shadow-blue-900/10">
         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/20 rounded-full blur-[100px] -mr-32 -mt-32"></div>
         <div className="relative z-10">
           <h1 className="text-4xl font-black tracking-tight flex items-center gap-3 uppercase">
@@ -80,7 +80,7 @@ export function AdminSettings() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 w-full flex-1">
           {/* SIDEBAR NAVIGATION WITHIN PAGE */}
           <div className="lg:col-span-1 space-y-3 w-full">
-            <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4 ml-1">Menu Pengaturan</p>
+            <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-4 ml-1">Menu Pengaturan</p>
             {sections.map((section) => (
               <button
                 key={section.id}
@@ -88,7 +88,7 @@ export function AdminSettings() {
                 className={`w-full flex items-center justify-between px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all ${
                   activeSection === section.id
                     ? "bg-blue-600 text-white shadow-xl shadow-blue-100 scale-[1.02]"
-                    : "bg-gray-50 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                    : "bg-gray-50 dark:bg-gray-800 text-gray-400 dark:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 hover:text-gray-600 dark:hover:text-gray-300"
                 }`}
               >
                 <div className="flex items-center gap-3">
@@ -101,37 +101,37 @@ export function AdminSettings() {
           </div>
 
           {/* Content Area */}
-          <div className="lg:col-span-3 w-full bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden animate-in fade-in duration-500 flex flex-col">
+          <div className="lg:col-span-3 w-full bg-white dark:bg-gray-900 rounded-[2.5rem] border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden animate-in fade-in duration-500 flex flex-col transition-colors">
             <div className="p-8 md:p-12 w-full flex-1">
               {activeSection === 'general' && (
                 <div className="space-y-8">
                   <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 shadow-sm">
+                    <div className="h-12 w-12 bg-blue-50 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-400 shadow-sm">
                       <Globe size={24} />
                     </div>
                     <div>
-                      <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight">General Settings</h3>
-                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Informasi dasar aplikasi</p>
+                      <h3 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">General Settings</h3>
+                      <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">Informasi dasar aplikasi</p>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block ml-1">Platform Name</label>
+                      <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest block ml-1">Platform Name</label>
                       <input 
                         type="text" 
                         defaultValue="GamifyLearn" 
                         disabled 
-                        className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent rounded-2xl text-gray-400 font-black italic cursor-not-allowed outline-none" 
+                        className="w-full px-6 py-4 bg-gray-50 dark:bg-gray-800 border-2 border-transparent rounded-2xl text-gray-400 dark:text-gray-500 font-black italic cursor-not-allowed outline-none" 
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block ml-1">System Version</label>
+                      <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest block ml-1">System Version</label>
                       <input 
                         type="text" 
                         defaultValue="v1.0.4-PJKR" 
                         disabled 
-                        className="w-full px-6 py-4 bg-gray-50 border-2 border-transparent rounded-2xl text-gray-400 font-black italic cursor-not-allowed outline-none" 
+                        className="w-full px-6 py-4 bg-gray-50 dark:bg-gray-800 border-2 border-transparent rounded-2xl text-gray-400 dark:text-gray-500 font-black italic cursor-not-allowed outline-none" 
                       />
                     </div>
                   </div>
@@ -141,35 +141,35 @@ export function AdminSettings() {
               {activeSection === 'content' && (
                 <div className="space-y-8">
                   <div className="flex items-center gap-4">
-                    <div className="h-12 w-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 shadow-sm">
+                    <div className="h-12 w-12 bg-blue-50 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-blue-600 dark:text-blue-400 shadow-sm">
                       <Layout size={24} />
                     </div>
                     <div>
-                      <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight">Dashboard Content</h3>
-                      <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Kustomisasi tampilan utama mahasiswa</p>
+                      <h3 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Dashboard Content</h3>
+                      <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest">Kustomisasi tampilan utama mahasiswa</p>
                     </div>
                   </div>
 
                   <div className="space-y-4 pt-4">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block ml-1">Teks Banner Utama (Hero Banner)</label>
+                    <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest block ml-1">Teks Banner Utama (Hero Banner)</label>
                     <textarea
                       rows={5}
                       placeholder="Contoh: Semangat belajarnya hari ini! \n Selesaikan kursusmu sekarang."
                       value={settings.dashboard_banner_text}
                       onChange={(e) => setSettings({ ...settings, dashboard_banner_text: e.target.value })}
-                      className="w-full px-6 py-5 bg-gray-50 border-2 border-transparent rounded-[2rem] font-bold text-gray-700 outline-none focus:border-blue-500 focus:bg-white transition-all resize-none shadow-inner"
+                      className="w-full px-6 py-5 bg-gray-50 dark:bg-gray-800 border-2 border-transparent rounded-[2rem] font-bold text-gray-700 dark:text-gray-200 outline-none focus:border-blue-500 focus:bg-white dark:focus:bg-gray-800 transition-all resize-none shadow-inner"
                     />
-                    <p className="text-[10px] text-gray-400 italic font-medium ml-1">Gunakan '\n' untuk membuat baris baru pada teks banner.</p>
+                    <p className="text-[10px] text-gray-400 dark:text-gray-500 italic font-medium ml-1">Gunakan '\n' untuk membuat baris baru pada teks banner.</p>
                   </div>
                 </div>
               )}
             </div>
 
-            <div className="p-8 bg-gray-50 border-t border-gray-100 flex justify-end shrink-0">
+            <div className="p-8 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-800 flex justify-end shrink-0">
               <button 
                 onClick={handleSave}
                 disabled={isSaving}
-                className="flex items-center justify-center gap-3 px-12 py-5 bg-blue-600 text-white rounded-[2rem] font-black text-xs uppercase tracking-[0.2em] hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 disabled:opacity-50 active:scale-95"
+                className="flex items-center justify-center gap-3 px-12 py-5 bg-blue-600 text-white rounded-[2rem] font-black text-xs uppercase tracking-[0.2em] hover:bg-blue-700 transition-all shadow-xl shadow-blue-100 dark:shadow-none disabled:opacity-50 active:scale-95"
               >
                 {isSaving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
                 <span>Simpan Perubahan</span>

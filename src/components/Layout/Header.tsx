@@ -8,6 +8,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useApp } from '../../contexts/AppContext';
 import api from '../../api/axios';
 import { toast } from 'sonner';
+import { ThemeToggle } from '../Shared/ThemeToggle';
 
 export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
  const { user } = useAuth();
@@ -138,7 +139,7 @@ export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
            placeholder="Cari materi atau tugas..." 
            value={searchQuery}
            onChange={(e) => setSearchQuery(e.target.value)}
-           className="w-full bg-gray-50/80 border border-transparent focus:bg-white focus:border-blue-100 rounded-xl py-2.5 pl-12 pr-4 text-xs font-bold outline-none transition-all shadow-inner"
+           className="w-full bg-gray-50/80 dark:bg-gray-800/80 dark:text-white border border-transparent focus:bg-white focus:border-blue-100 dark:focus:border-gray-700 rounded-xl py-2.5 pl-12 pr-4 text-xs font-bold outline-none transition-all shadow-inner"
          />
 
          {showSearchResults && searchResults.length > 0 && (
@@ -159,6 +160,7 @@ export function Header({ onMenuClick }: { onMenuClick?: () => void }) {
 
      {/* Right Actions */}
      <div className="flex items-center gap-2 md:gap-4">
+       <ThemeToggle />
        <div className="relative" ref={dropdownRef}>
          <button 
            onClick={() => setShowDropdown(!showDropdown)} 

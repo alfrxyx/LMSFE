@@ -94,11 +94,11 @@ export function AdminDashboard() {
     };
 
     return (
-        <div className="w-full flex flex-col gap-10 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm min-h-screen">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-8 bg-gray-50/50 p-8 rounded-[2.5rem] border border-gray-100/50 shrink-0">
+        <div className="w-full flex flex-col gap-10 p-6 md:p-10 bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm min-h-screen transition-colors duration-300">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-8 bg-gray-50/50 dark:bg-gray-800/50 p-8 rounded-[2.5rem] border border-gray-100/50 dark:border-gray-700/50 shrink-0">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-                    <p className="mt-2 text-gray-600">
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Admin Dashboard</h1>
+                    <p className="mt-2 text-gray-600 dark:text-gray-400">
                         Overview of platform performance and student progress
                     </p>
                 </div>
@@ -115,19 +115,19 @@ export function AdminDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 
                 {/* 1. Total Students (Live Data) */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 hover:shadow-md transition-all">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium text-gray-600">Total Students</p>
+                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Students</p>
                             {/* LIVE DATA: total_students */}
-                            <p className="text-3xl font-bold text-gray-900 mt-2">{stats.total_students.toLocaleString()}</p>
+                            <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{stats.total_students.toLocaleString()}</p>
                         </div>
-                        <div className="bg-blue-50 p-3 rounded-full">
-                            <Users className="h-6 w-6 text-blue-600" />
+                        <div className="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-full">
+                            <Users className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                         </div>
                     </div>
                     <div className="mt-4">
-                        <div className="flex items-center text-sm text-green-600">
+                        <div className="flex items-center text-sm text-green-600 dark:text-green-400">
                             <TrendingUp className="h-4 w-4 mr-1" />
                             {/* MOCK DATA: newStudentsThisWeek */}
                             <span>+{mockData.newStudentsThisWeek} this week</span> 
@@ -136,19 +136,19 @@ export function AdminDashboard() {
                 </div>
 
                 {/* 2. Active Courses (Live Data) */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 hover:shadow-md transition-all">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium text-gray-600">Active Courses</p>
+                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Active Courses</p>
                             {/* LIVE DATA: active_courses */}
-                            <p className="text-3xl font-bold text-gray-900 mt-2">{stats.active_courses}</p>
+                            <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{stats.active_courses}</p>
                         </div>
-                        <div className="bg-green-50 p-3 rounded-full">
-                            <BookOpen className="h-6 w-6 text-green-600" />
+                        <div className="bg-green-50 dark:bg-green-900/30 p-3 rounded-full">
+                            <BookOpen className="h-6 w-6 text-green-600 dark:text-green-400" />
                         </div>
                     </div>
                     <div className="mt-4">
-                        <div className="flex items-center text-sm text-blue-600">
+                        <div className="flex items-center text-sm text-blue-600 dark:text-blue-400">
                             <Eye className="h-4 w-4 mr-1" />
                             {/* MOCK DATA: totalVideoViews */}
                             <span>{mockData.totalVideoViews} total views</span>
@@ -157,19 +157,19 @@ export function AdminDashboard() {
                 </div>
 
                 {/* 3. Completions (Live Data) */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 hover:shadow-md transition-all">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium text-gray-600">Completions</p>
+                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Completions</p>
                             {/* LIVE DATA: completions */}
-                            <p className="text-3xl font-bold text-gray-900 mt-2">{stats.completions}</p>
+                            <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{stats.completions}</p>
                         </div>
-                        <div className="bg-purple-50 p-3 rounded-full">
-                            <Trophy className="h-6 w-6 text-purple-600" />
+                        <div className="bg-purple-50 dark:bg-purple-900/30 p-3 rounded-full">
+                            <Trophy className="h-6 w-6 text-purple-600 dark:text-purple-400" />
                         </div>
                     </div>
                     <div className="mt-4">
-                        <div className="flex items-center text-sm text-purple-600">
+                        <div className="flex items-center text-sm text-purple-600 dark:text-purple-400">
                             <UserCheck className="h-4 w-4 mr-1" />
                             {/* MOCK DATA: avgProgress */}
                             <span>{mockData.avgProgress}% avg progress</span>
@@ -178,19 +178,19 @@ export function AdminDashboard() {
                 </div>
 
                 {/* 4. Quiz Attempts (Live Data) */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 hover:shadow-md transition-all">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-sm font-medium text-gray-600">Quiz Attempts</p>
+                            <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Quiz Attempts</p>
                             {/* LIVE DATA: quiz_attempts */}
-                            <p className="text-3xl font-bold text-gray-900 mt-2">{stats.quiz_attempts}</p>
+                            <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{stats.quiz_attempts}</p>
                         </div>
-                        <div className="bg-amber-50 p-3 rounded-full">
-                            <Award className="h-6 w-6 text-amber-600" />
+                        <div className="bg-amber-50 dark:bg-amber-900/30 p-3 rounded-full">
+                            <Award className="h-6 w-6 text-amber-600 dark:text-amber-400" />
                         </div>
                     </div>
                     <div className="mt-4">
-                        <div className="flex items-center text-sm text-amber-600">
+                        <div className="flex items-center text-sm text-amber-600 dark:text-amber-400">
                             <TrendingUp className="h-4 w-4 mr-1" />
                             {/* MOCK DATA: avgQuizScore */}
                             <span>{mockData.avgQuizScore}% avg score</span>
@@ -202,29 +202,29 @@ export function AdminDashboard() {
             {/* Recent Activity dan Top Performers (Menggunakan Data Mock dari AppContext) */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Recent Activity */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-6">Recent Student Activity</h3>
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 transition-colors duration-300">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Recent Student Activity</h3>
                     {/* Placeholder content - Anda perlu mengganti ini dengan API baru */}
                     <div className="space-y-4">
                          {/* Menggunakan data mock AppContext */}
-                        {courses.length > 0 && <p className='text-gray-500'>Courses loaded: {courses.length} (Mock Data)</p>}
+                        {courses.length > 0 && <p className='text-gray-500 dark:text-gray-400'>Courses loaded: {courses.length} (Mock Data)</p>}
                         {leaderboard.slice(0, 4).map(student => (
-                             <div key={student.id} className="text-sm border-b pb-2">
-                                <strong>{student.name}</strong> started a course.
+                             <div key={student.id} className="text-sm border-b dark:border-gray-700 pb-2 text-gray-600 dark:text-gray-300">
+                                <strong className="text-gray-900 dark:text-white">{student.name}</strong> started a course.
                             </div>
                         ))}
                     </div>
                 </div>
 
                 {/* Top Performers */}
-                <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-6">Top Performers</h3>
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 transition-colors duration-300">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Top Performers</h3>
                     {/* Menggunakan data mock leaderboard */}
                     <div className="space-y-3">
                         {leaderboard.slice(0, 5).map((student, index) => (
-                            <div key={student.id} className="flex justify-between text-sm">
+                            <div key={student.id} className="flex justify-between text-sm text-gray-600 dark:text-gray-300">
                                 <span>{index + 1}. {student.name}</span>
-                                <span>{student.points.toLocaleString()} pts</span>
+                                <span className="font-bold text-gray-900 dark:text-white">{student.points.toLocaleString()} pts</span>
                             </div>
                         ))}
                     </div>
@@ -232,9 +232,9 @@ export function AdminDashboard() {
             </div>
 
             {/* Course Performance */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-6">Course Performance (Mock)</h3>
-                {courses.length === 0 ? <p>No courses available (Mock).</p> : <p>{courses.length} courses loaded.</p>}
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6 transition-colors duration-300">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Course Performance (Mock)</h3>
+                {courses.length === 0 ? <p className="text-gray-500 dark:text-gray-400">No courses available (Mock).</p> : <p className="text-gray-500 dark:text-gray-400">{courses.length} courses loaded.</p>}
             </div>
         </div>
     );

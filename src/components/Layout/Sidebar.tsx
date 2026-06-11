@@ -68,14 +68,14 @@ export function Sidebar() {
   const menuItems = getMenuItems();
 
   return (
-    <aside className="hidden lg:flex fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-100 flex-col h-full shadow-sm font-['Roboto']">
+    <aside className="hidden lg:flex fixed inset-y-0 left-0 z-40 w-64 bg-white dark:bg-gray-900 border-r border-gray-100 dark:border-gray-800 flex-col h-full shadow-sm font-['Roboto'] transition-colors duration-300">
       {/* Logo Section */}
       <div className="p-8 flex items-center gap-3">
-        <div className="h-10 w-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-blue-200">
+        <div className="h-10 w-10 bg-blue-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-blue-200 dark:shadow-none">
           G
         </div>
         <div>
-          <h2 className="text-xl font-black text-gray-900 tracking-tight leading-none uppercase">Gamify</h2>
+          <h2 className="text-xl font-black text-gray-900 dark:text-white tracking-tight leading-none uppercase">Gamify</h2>
           <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest mt-1">LMS PJKR UM</p>
         </div>
       </div>
@@ -89,13 +89,13 @@ export function Sidebar() {
             className={({ isActive }) => 
               `flex items-center justify-between px-5 py-3.5 rounded-2xl transition-all duration-300 group ${
                 isActive 
-                  ? 'bg-blue-600 text-white shadow-xl shadow-blue-100' 
-                  : 'text-gray-500 hover:bg-blue-50 hover:text-blue-600'
+                  ? 'bg-blue-600 text-white shadow-xl shadow-blue-100 dark:shadow-none' 
+                  : 'text-gray-500 dark:text-gray-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400'
               }`
             }
           >
             <div className="flex items-center gap-4">
-              <item.icon size={18} className={`${location.pathname === item.href ? 'text-white' : 'text-gray-400 group-hover:text-blue-600'}`} />
+              <item.icon size={18} className={`${location.pathname === item.href ? 'text-white' : 'text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400'}`} />
               <span className="text-xs font-bold tracking-tight">{item.name}</span>
             </div>
             <ChevronRight size={14} className={`opacity-0 group-hover:opacity-40 transition-opacity ${location.pathname === item.href ? 'hidden' : ''}`} />
@@ -104,10 +104,10 @@ export function Sidebar() {
       </nav>
 
       {/* User Card Section */}
-      <div className="p-6 border-t border-gray-50 bg-gray-50/50">
-        <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm space-y-4">
+      <div className="p-6 border-t border-gray-50 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/20">
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm space-y-4">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 overflow-hidden shadow-inner">
+            <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 overflow-hidden shadow-inner">
               {user?.avatar ? (
                 <img src={user.avatar} alt={user?.name} className="h-full w-full object-cover" />
               ) : (
@@ -115,8 +115,8 @@ export function Sidebar() {
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-black text-gray-900 truncate uppercase tracking-tight">{user?.name}</p>
-              <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">{user?.role}</p>
+              <p className="text-xs font-black text-gray-900 dark:text-white truncate uppercase tracking-tight">{user?.name}</p>
+              <p className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest">{user?.role}</p>
             </div>
           </div>
 
@@ -126,14 +126,14 @@ export function Sidebar() {
             </div>
           )}
           
-          <div className="flex items-center justify-between px-1 pt-2 border-t border-gray-50">
+          <div className="flex items-center justify-between px-1 pt-2 border-t border-gray-50 dark:border-gray-700">
             <div className="flex items-center gap-1.5">
               <Trophy size={14} className="text-orange-500" />
-              <span className="text-xs font-black text-gray-700">{user?.points} XP</span>
+              <span className="text-xs font-black text-gray-700 dark:text-gray-300">{user?.points} XP</span>
             </div>
             <button 
               onClick={logout}
-              className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+              className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all"
               title="Logout"
             >
               <LogOut size={16} />

@@ -16,33 +16,33 @@ export function QuickActions() {
         <Link
           key={action.name}
           to={action.href}
-          className="uiverse-card group bg-white rounded-[40px] p-8 h-[240px] shadow-xl border border-gray-50 flex flex-col justify-between overflow-hidden"
+          className="uiverse-card group bg-white dark:bg-gray-900 rounded-[40px] p-8 h-[240px] shadow-xl border border-gray-50 dark:border-gray-800 flex flex-col justify-between overflow-hidden transition-colors"
         >
           {/* Layer Glassmorphism */}
-          <div className="uiverse-glass"></div>
+          <div className="uiverse-glass dark:bg-gray-800/20"></div>
 
           {/* Header */}
           <div className="uiverse-content flex justify-between items-start">
-            <div className={`${action.bg} ${action.color} p-3 rounded-2xl group-hover:scale-110 transition-transform shadow-sm`}>
+            <div className={`${action.bg} dark:bg-opacity-20 ${action.color} p-3 rounded-2xl group-hover:scale-110 transition-transform shadow-sm`}>
               <action.icon className="h-5 w-5" />
             </div>
-            <Bookmark className="h-4 w-4 text-gray-200 group-hover:text-blue-500 transition-colors" />
+            <Bookmark className="h-4 w-4 text-gray-200 dark:text-gray-700 group-hover:text-blue-500 transition-colors" />
           </div>
 
           {/* Body */}
           <div className="uiverse-content space-y-1">
-            <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none">
+            <p className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest leading-none">
               {action.category}
             </p>
-            <h4 className="text-lg font-black text-gray-900 leading-tight group-hover:text-blue-600 transition-colors">
+            <h4 className="text-lg font-black text-gray-900 dark:text-white leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
               {action.name}
             </h4>
           </div>
 
           {/* Footer Tombol */}
-          <div className="uiverse-content flex items-center justify-between pt-4 border-t border-gray-50/50">
-            <span className="text-[9px] font-bold text-gray-400 uppercase">Quick Access</span>
-            <div className="bg-gray-900 text-white px-5 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest group-hover:bg-blue-600 transition-all flex items-center gap-2 shadow-lg shadow-gray-200">
+          <div className="uiverse-content flex items-center justify-between pt-4 border-t border-gray-50/50 dark:border-gray-800">
+            <span className="text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase">Quick Access</span>
+            <div className="bg-gray-900 dark:bg-blue-600 text-white px-5 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest group-hover:bg-blue-600 dark:group-hover:bg-blue-500 transition-all flex items-center gap-2 shadow-lg shadow-gray-200 dark:shadow-none">
               Launch <ChevronRight className="h-3 w-3" />
             </div>
           </div>

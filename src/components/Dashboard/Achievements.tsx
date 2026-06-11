@@ -29,23 +29,23 @@ export function Achievements() {
  return (
  <div className="flex flex-col items-center justify-center h-[60vh]">
  <div className="h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
- <p className="text-gray-500 font-black uppercase tracking-widest text-[10px] animate-pulse">Memuat Lencana PJKR...</p>
+ <p className="text-gray-500 dark:text-gray-400 font-black uppercase tracking-widest text-[10px] animate-pulse">Memuat Lencana PJKR...</p>
  </div>
  );
  }
 
  return (
-   <div className="space-y-8 p-4 md:p-8 bg-white rounded-xl border border-gray-100 shadow-sm">
+   <div className="space-y-8 p-4 md:p-8 bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm transition-colors duration-300">
  <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
  <div>
- <h1 className="text-4xl font-black text-gray-900 tracking-tight flex items-center gap-3">
+ <h1 className="text-4xl font-black text-gray-900 dark:text-white tracking-tight flex items-center gap-3">
  Lencana Saya <Trophy className="h-10 w-10 text-purple-600" />
  </h1>
- <p className="mt-2 text-gray-500 font-medium italic">Selesaikan tantangan praktik PJKR untuk membuka lencana eksklusif.</p>
+ <p className="mt-2 text-gray-500 dark:text-gray-400 font-medium italic">Selesaikan tantangan praktik PJKR untuk membuka lencana eksklusif.</p>
  </div>
- <div className="bg-purple-50 px-6 py-3 rounded-2xl border border-purple-100 shadow-sm flex items-center gap-3">
- <Award className="h-6 w-6 text-purple-600" />
- <span className="text-xs font-black text-purple-700 uppercase tracking-widest">{user?.achievements?.length || 0} TERKUMPUL</span>
+ <div className="bg-purple-50 dark:bg-purple-900/30 px-6 py-3 rounded-2xl border border-purple-100 dark:border-purple-800 shadow-sm flex items-center gap-3">
+ <Award className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+ <span className="text-xs font-black text-purple-700 dark:text-purple-300 uppercase tracking-widest">{user?.achievements?.length || 0} TERKUMPUL</span>
  </div>
  </div>
 
@@ -55,17 +55,17 @@ export function Achievements() {
  allAchievements.map((achievement) => {
  const isEarned = user?.achievements?.some((a: any) => a.id === achievement.id);
  return (
- <div key={achievement.id} className={`p-6 rounded-3xl border-2 text-center ${isEarned ? 'bg-white border-purple-100' : 'bg-gray-50 opacity-60 grayscale'}`}>
- <div className="h-20 w-20 mx-auto bg-purple-100 rounded-full flex items-center justify-center mb-4">
- {isEarned ? <Award className="h-10 w-10 text-purple-600" /> : <Lock className="h-10 w-10 text-gray-400" />}
+ <div key={achievement.id} className={`p-6 rounded-3xl border-2 text-center transition-all ${isEarned ? 'bg-white dark:bg-gray-800 border-purple-100 dark:border-purple-900' : 'bg-gray-50 dark:bg-gray-800/50 border-gray-100 dark:border-gray-800 opacity-60 grayscale'}`}>
+ <div className="h-20 w-20 mx-auto bg-purple-100 dark:bg-purple-900/50 rounded-full flex items-center justify-center mb-4 transition-colors">
+ {isEarned ? <Award className="h-10 w-10 text-purple-600 dark:text-purple-400" /> : <Lock className="h-10 w-10 text-gray-400 dark:text-gray-600" />}
  </div>
- <h3 className="font-bold">{achievement.name}</h3>
- <p className="text-xs text-gray-500 mt-2">{achievement.description}</p>
+ <h3 className="font-bold text-gray-900 dark:text-white">{achievement.name}</h3>
+ <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">{achievement.description}</p>
  </div>
  );
  })
  ) : (
- <div className="col-span-full text-center py-10 text-gray-400">
+ <div className="col-span-full text-center py-10 text-gray-400 dark:text-gray-600">
  Belum ada data lencana di database. Pastikan sudah menjalankan seeder.
  </div>
  )}

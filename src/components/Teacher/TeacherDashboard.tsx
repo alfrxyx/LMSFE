@@ -86,7 +86,7 @@ useEffect(() => {
 }, []);
 
 return (
-  <div className="w-full flex flex-col gap-10 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm min-h-screen">
+  <div className="w-full flex flex-col gap-10 p-6 md:p-10 bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm min-h-screen transition-colors duration-300">
       {/* HEADER SECTION */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8 bg-[#0F172A] p-10 rounded-[2.5rem] text-white relative overflow-hidden shrink-0 shadow-2xl shadow-blue-900/10">
         <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/20 rounded-full blur-[100px] -mr-32 -mt-32"></div>
@@ -124,7 +124,7 @@ return (
       {loading ? (
         <div className="flex-1 flex flex-col items-center justify-center py-20">
           <div className="h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-gray-400 font-bold uppercase text-[10px] tracking-widest animate-pulse">Menyiapkan Dashboard Dosen...</p>
+          <p className="text-gray-400 dark:text-gray-500 font-bold uppercase text-[10px] tracking-widest animate-pulse">Menyiapkan Dashboard Dosen...</p>
         </div>
       ) : (
         <div className="flex-1 w-full">
@@ -140,9 +140,9 @@ return (
 
               {/* CHARTS */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full">
-                <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm min-h-[400px]">
-                  <h3 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-8 flex items-center gap-2">
-                     <BarChart3 size={18} className="text-blue-600" /> Penyelesaian Materi
+                <div className="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm min-h-[400px]">
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-widest mb-8 flex items-center gap-2">
+                     <BarChart3 size={18} className="text-blue-600 dark:text-blue-400" /> Penyelesaian Materi
                   </h3>
                   <div className="h-64 w-full">
                     {isMounted && stats?.pedagogical_stats?.difficult_materials && (
@@ -159,9 +159,9 @@ return (
                   </div>
                 </div>
                 
-                <div className="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm min-h-[400px]">
-                  <h3 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-8 flex items-center gap-2">
-                     <Activity size={18} className="text-blue-600" /> Tren Performa XP
+                <div className="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm min-h-[400px]">
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-widest mb-8 flex items-center gap-2">
+                     <Activity size={18} className="text-blue-600 dark:text-blue-400" /> Tren Performa XP
                   </h3>
                   <div className="h-64 w-full">
                     {isMounted && semesterXPStats.length > 0 && (
@@ -179,9 +179,9 @@ return (
               </div>
 
               {/* MONITORING CONTAINER */}
-              <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden w-full">
-                <div className="p-8 border-b border-gray-100 bg-gray-50 flex items-center justify-between">
-                  <h3 className="text-sm font-black text-gray-900 uppercase tracking-widest">Student Progress Monitoring</h3>
+              <div className="bg-white dark:bg-gray-800 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm overflow-hidden w-full transition-colors duration-300">
+                <div className="p-8 border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 flex items-center justify-between">
+                  <h3 className="text-sm font-black text-gray-900 dark:text-white uppercase tracking-widest">Student Progress Monitoring</h3>
                 </div>
                 <div className="p-8 w-full">
                   <StudentMonitoring />
@@ -189,7 +189,7 @@ return (
               </div>
             </div>
           ) : (
-            <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm min-h-[60vh] animate-in fade-in duration-500 w-full">
+            <div className="bg-white dark:bg-gray-800 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm min-h-[60vh] animate-in fade-in duration-500 w-full transition-colors duration-300">
               <SubmissionsPanel onGradeComplete={fetchDashboardData} />
             </div>
           )}
@@ -203,26 +203,26 @@ function StatCard({ label, value, icon: Icon, onClick, sublabel }: any) {
   return (
     <div 
       onClick={onClick}
-      className={`uiverse-card bg-white min-h-[240px] h-auto rounded-[40px] shadow-xl border border-gray-100 flex flex-col items-center justify-center text-center p-8 group overflow-hidden transition-all ${onClick ? 'cursor-pointer active:scale-95' : ''}`}
+      className={`uiverse-card bg-white dark:bg-gray-800 min-h-[240px] h-auto rounded-[40px] shadow-xl dark:shadow-none border border-gray-100 dark:border-gray-700 flex flex-col items-center justify-center text-center p-8 group overflow-hidden transition-all ${onClick ? 'cursor-pointer active:scale-95' : ''}`}
     >
       {/* Glass Layer - Subtle light effect for white card */}
-      <div className="uiverse-glass !opacity-10 !bg-gray-50"></div>
+      <div className="uiverse-glass !opacity-10 !bg-gray-50 dark:!bg-gray-900"></div>
 
       {/* Ikon Stat - Blue accent for white card */}
-      <div className="uiverse-content p-3 bg-blue-50 rounded-2xl mb-4 group-hover:scale-110 transition-transform">
-        <Icon className="h-6 w-6 text-blue-600" />
+      <div className="uiverse-content p-3 bg-blue-50 dark:bg-blue-900/30 rounded-2xl mb-4 group-hover:scale-110 transition-transform">
+        <Icon className="h-6 w-6 text-blue-600 dark:text-blue-400" />
       </div>
       
       <div className="uiverse-content space-y-1">
-        <span className="text-4xl font-black text-gray-900 tracking-tighter">
+        <span className="text-4xl font-black text-gray-900 dark:text-white tracking-tighter">
           {value || 0}
         </span>
-        <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">
+        <p className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest">
           {sublabel}
         </p>
       </div>
 
-      <p className="uiverse-content mt-4 text-[9px] font-bold text-gray-400 uppercase tracking-[0.2em]">
+      <p className="uiverse-content mt-4 text-[9px] font-bold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em]">
         {label}
       </p>
     </div>
@@ -247,21 +247,21 @@ function SubmissionsPanel({ onGradeComplete }: any) {
 
   useEffect(() => { fetchSubmissions(); }, []);
 
-  if (loading) return <div className="py-20 text-center text-gray-400 font-bold uppercase text-[10px] tracking-[0.2em] animate-pulse">Memuat Antrean Penilaian...</div>;
+  if (loading) return <div className="py-20 text-center text-gray-400 dark:text-gray-500 font-bold uppercase text-[10px] tracking-[0.2em] animate-pulse">Memuat Antrean Penilaian...</div>;
 
   return (
     <div className="p-8 space-y-8">
-      <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight">Antrean Penilaian ({submissions.length})</h3>
-      <div className="divide-y divide-gray-100 border border-gray-100 rounded-[2.5rem] overflow-hidden shadow-sm">
+      <h3 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Antrean Penilaian ({submissions.length})</h3>
+      <div className="divide-y divide-gray-100 dark:divide-gray-700 border border-gray-100 dark:border-gray-700 rounded-[2.5rem] overflow-hidden shadow-sm transition-colors duration-300">
         {submissions.map(sub => (
-          <div key={sub.id} className="p-6 flex items-center justify-between gap-6 bg-white hover:bg-gray-50 transition-colors">
+          <div key={sub.id} className="p-6 flex items-center justify-between gap-6 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
             <div className="flex items-center gap-5">
-              <div className="h-16 w-16 rounded-[1.5rem] bg-gray-100 flex items-center justify-center overflow-hidden border border-gray-200 font-bold text-gray-400">
+              <div className="h-16 w-16 rounded-[1.5rem] bg-gray-100 dark:bg-gray-900 flex items-center justify-center overflow-hidden border border-gray-200 dark:border-gray-700 font-bold text-gray-400 dark:text-gray-500">
                 {sub.user?.avatar ? <img src={sub.user.avatar} className="h-full w-full object-cover" /> : sub.user?.name[0]}
               </div>
               <div>
-                <p className="font-black text-gray-900 uppercase text-sm tracking-tight">{sub.user?.name}</p>
-                <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">{sub.level?.title}</p>
+                <p className="font-black text-gray-900 dark:text-white uppercase text-sm tracking-tight">{sub.user?.name}</p>
+                <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest mt-1">{sub.level?.title}</p>
               </div>
             </div>
             <button 
@@ -269,7 +269,7 @@ function SubmissionsPanel({ onGradeComplete }: any) {
                 setSelectedSubmission(sub);
                 setIsGradingModalOpen(true);
               }}
-              className="px-8 py-3 bg-blue-600 text-white text-[10px] font-black rounded-2xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 uppercase tracking-widest active:scale-95"
+              className="px-8 py-3 bg-blue-600 text-white text-[10px] font-black rounded-2xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 dark:shadow-none uppercase tracking-widest active:scale-95"
             >
               NILAI SEKARANG
             </button>
@@ -278,7 +278,7 @@ function SubmissionsPanel({ onGradeComplete }: any) {
         {submissions.length === 0 && (
           <div className="py-24 text-center">
              <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto mb-4" />
-             <p className="text-gray-400 text-sm font-black uppercase tracking-widest">Semua Tugas Sudah Dinilai!</p>
+             <p className="text-gray-400 dark:text-gray-500 text-sm font-black uppercase tracking-widest">Semua Tugas Sudah Dinilai!</p>
           </div>
         )}
       </div>

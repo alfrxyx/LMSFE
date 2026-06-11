@@ -68,9 +68,9 @@ export function Dashboard() {
   const displayUser = authUser;
 
   return (
-    <div className="w-full flex flex-col gap-6 md:gap-8 pb-10 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm min-h-screen">
+    <div className="w-full flex flex-col gap-6 md:gap-8 pb-10 p-6 md:p-10 bg-white dark:bg-gray-950 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm min-h-screen transition-colors duration-300">
       {/* HEADER SECTION - Status Ribbon */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-gray-50/50 p-6 md:p-8 rounded-3xl md:rounded-[2.5rem] border border-gray-100/50 shrink-0">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-gray-50/50 dark:bg-gray-900/40 p-6 md:p-8 rounded-3xl md:rounded-[2.5rem] border border-gray-100/50 dark:border-gray-800/50 shrink-0">
         <div className="flex items-center gap-4 md:gap-6">
           <div className="h-12 w-12 md:h-14 md:h-14 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg md:text-xl shadow-md overflow-hidden shrink-0">
             {displayUser?.avatar ? (
@@ -80,31 +80,31 @@ export function Dashboard() {
             )}
           </div>
           <div className="min-w-0">
-            <h2 className="text-lg md:text-xl font-bold text-gray-900 truncate">{displayUser?.name}</h2>
-            <p className="text-[10px] md:text-xs text-gray-500 font-medium">{displayUser?.role} • Semester {displayUser?.semester || '6'}</p>
+            <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white truncate">{displayUser?.name}</h2>
+            <p className="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 font-medium">{displayUser?.role} • Semester {displayUser?.semester || '6'}</p>
           </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-4 md:gap-10">
           <div className="flex items-center gap-3">
-             <div className="p-2 md:p-2.5 bg-white rounded-xl shadow-sm border border-gray-100">
+             <div className="p-2 md:p-2.5 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
                 <Trophy size={16} className="text-yellow-500 md:w-[18px] md:h-[18px]" />
              </div>
              <div>
-                <p className="text-[8px] md:text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Total XP</p>
-                <p className="text-xs md:text-sm font-black text-gray-900 leading-none">{displayUser?.points?.toLocaleString()}</p>
+                <p className="text-[8px] md:text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest leading-none mb-1">Total XP</p>
+                <p className="text-xs md:text-sm font-black text-gray-900 dark:text-white leading-none">{displayUser?.points?.toLocaleString()}</p>
              </div>
           </div>
 
-          <div className="h-8 md:h-10 w-px bg-gray-100 hidden sm:block"></div>
+          <div className="h-8 md:h-10 w-px bg-gray-100 dark:bg-gray-800 hidden sm:block"></div>
 
           <div className="flex items-center gap-3">
-             <div className="p-2 md:p-2.5 bg-white rounded-xl shadow-sm border border-gray-100">
+             <div className="p-2 md:p-2.5 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
                 <Star size={16} className="text-blue-500 md:w-[18px] md:h-[18px]" />
              </div>
              <div>
-                <p className="text-[8px] md:text-[9px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Status</p>
-                <p className="text-xs md:text-sm font-black text-blue-600 leading-none uppercase">Lvl {displayUser?.level}</p>
+                <p className="text-[8px] md:text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest leading-none mb-1">Status</p>
+                <p className="text-xs md:text-sm font-black text-blue-600 dark:text-blue-400 leading-none uppercase">Lvl {displayUser?.level}</p>
              </div>
           </div>
 
@@ -215,29 +215,29 @@ export function Dashboard() {
         
         {/* RANK CARD */}
         <div className="uiverse-parent lg:col-span-4 h-full">
-          <div className="uiverse-card bg-white rounded-3xl p-6 md:p-8 h-full shadow-xl border border-gray-50 flex flex-col justify-between overflow-hidden relative group">
+          <div className="uiverse-card bg-white dark:bg-gray-900 rounded-3xl p-6 md:p-8 h-full shadow-xl border border-gray-50 dark:border-gray-800 flex flex-col justify-between overflow-hidden relative group">
             <div className="logo pointer-events-none">
               <span className="uiverse-logo-circle w-32 h-32 -top-4 -right-4 bg-blue-600/5 opacity-20 group-hover:scale-110 transition-transform duration-700"></span>
               <span className="uiverse-logo-circle w-24 h-24 top-2 right-2 bg-blue-600/10 opacity-30"></span>
             </div>
-            <div className="uiverse-glass !rounded-2xl"></div>
+            <div className="uiverse-glass !rounded-2xl dark:bg-gray-800/40"></div>
             <div className="uiverse-content relative z-10">
               <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4 md:mb-6">Peringkat Anda</h3>
               <div className="flex items-center gap-5">
-                <div className="h-14 w-14 md:h-16 md:w-16 bg-blue-50 rounded-xl flex items-center justify-center border border-blue-100 shadow-inner group-hover:rotate-6 transition-transform">
-                  <Crown className="h-7 w-7 md:h-8 md:w-8 text-blue-600" />
+                <div className="h-14 w-14 md:h-16 md:w-16 bg-blue-50 dark:bg-blue-900/30 rounded-xl flex items-center justify-center border border-blue-100 dark:border-blue-800 shadow-inner group-hover:rotate-6 transition-transform">
+                  <Crown className="h-7 w-7 md:h-8 md:w-8 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
-                  <p className="text-4xl md:text-5xl font-black text-gray-900 tracking-tighter">#{displayUser?.rank || '1'}</p>
-                  <p className="text-[9px] md:text-[10px] font-bold text-blue-600 uppercase tracking-widest mt-1">
+                  <p className="text-4xl md:text-5xl font-black text-gray-900 dark:text-white tracking-tighter">#{displayUser?.rank || '1'}</p>
+                  <p className="text-[9px] md:text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mt-1">
                     Peringkat Global
                   </p>
                 </div>
               </div>
             </div>
-            <Link to="/leaderboard" className="uiverse-content relative z-10 mt-6 md:mt-8 flex items-center justify-between group/btn p-3 md:p-4 bg-gray-50 rounded-xl hover:bg-blue-600 hover:text-white transition-all duration-300">
+            <Link to="/leaderboard" className="uiverse-content relative z-10 mt-6 md:mt-8 flex items-center justify-between group/btn p-3 md:p-4 bg-gray-50 dark:bg-gray-800 rounded-xl hover:bg-blue-600 hover:text-white transition-all duration-300">
               <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest">Buka Leaderboard</span>
-              <div className="p-1.5 md:p-2 bg-white rounded-lg text-gray-900 shadow-sm group-hover/btn:scale-110 transition-transform">
+              <div className="p-1.5 md:p-2 bg-white dark:bg-gray-700 rounded-lg text-gray-900 dark:text-white shadow-sm group-hover/btn:scale-110 transition-transform">
                 <ChevronRight className="h-3 w-3 md:h-4 md:w-4" />
               </div>
             </Link>
@@ -257,16 +257,16 @@ export function Dashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-20">
-        <div className="bg-white rounded-3xl border border-gray-100 p-6 md:p-8 shadow-sm">
+        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800 p-6 md:p-8 shadow-sm transition-colors">
           <div className="flex items-center justify-between mb-6 md:mb-8">
-            <h3 className="text-[10px] md:text-[11px] font-black text-gray-900 uppercase tracking-widest flex items-center gap-2">
+            <h3 className="text-[10px] md:text-[11px] font-black text-gray-900 dark:text-white uppercase tracking-widest flex items-center gap-2">
               <Star className="h-3.5 w-3.5 md:h-4 md:w-4 text-blue-600" /> Active Lessons
             </h3>
           </div>
           <ProgressOverview userData={displayUser} />
         </div>
-        <div className="bg-white rounded-3xl border border-gray-100 p-6 md:p-8 shadow-sm">
-          <h3 className="text-[10px] md:text-[11px] font-black text-gray-900 uppercase tracking-widest mb-6 md:mb-8">Recent Activities</h3>
+        <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800 p-6 md:p-8 shadow-sm transition-colors">
+          <h3 className="text-[10px] md:text-[11px] font-black text-gray-900 dark:text-white uppercase tracking-widest mb-6 md:mb-8">Recent Activities</h3>
           <RecentActivity />
         </div>
       </div>

@@ -102,25 +102,25 @@ export function Analytics() {
  const metrics = liveAnalyticsData.detailedMetrics; // Menggunakan data live
 
  return (
-   <div className="w-full flex flex-col gap-10 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm min-h-screen">
+   <div className="w-full flex flex-col gap-10 p-6 md:p-10 bg-white dark:bg-gray-950 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm min-h-screen transition-colors duration-300">
  {/* Header dan Filter */}
- <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 bg-gray-50/50 p-8 rounded-[2.5rem] border border-gray-100/50 shrink-0">
+ <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 bg-gray-50/50 dark:bg-gray-900/40 p-8 rounded-[2.5rem] border border-gray-100/50 dark:border-gray-800 shrink-0">
  <div>
- <h1 className="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
- <p className="mt-2 text-gray-600">
+ <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Analytics Dashboard</h1>
+ <p className="mt-2 text-gray-600 dark:text-gray-400">
  Track platform performance and user engagement metrics
  </p>
  </div>
  <div className="mt-4 sm:mt-0 flex items-center space-x-3">
- <div className="flex bg-gray-100 rounded-lg p-1">
+ <div className="flex bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
  {['7d', '30d', '90d', '1y'].map((range) => (
  <button
  key={range}
  onClick={() => setTimeRange(range as typeof timeRange)}
  className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
  timeRange === range
- ? 'bg-white text-gray-900 shadow-sm'
- : 'text-gray-500 hover:text-gray-700'
+ ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+ : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
  }`}
  >
  {range}
@@ -138,16 +138,16 @@ export function Analytics() {
  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
  
  {/* 1. Total Users */}
- <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+ <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 transition-colors">
  <div className="flex items-center justify-between">
  <div>
- <p className="text-sm font-medium text-gray-600">Total Users</p>
- <p className="text-3xl font-bold text-gray-900 mt-2">{stats.totalUsers.toLocaleString()}</p>
+ <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Users</p>
+ <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{stats.totalUsers.toLocaleString()}</p>
  </div>
- <div className="bg-blue-50 p-3 rounded-full"><Users className="h-6 w-6 text-blue-600" /></div>
+ <div className="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-full"><Users className="h-6 w-6 text-blue-600 dark:text-blue-400" /></div>
  </div>
  <div className="mt-4">
- <div className="flex items-center text-sm text-green-600">
+ <div className="flex items-center text-sm text-green-600 dark:text-green-400">
  <TrendingUp className="h-4 w-4 mr-1" />
  <span>+{stats.totalUsers - (stats.totalUsers * 0.875)} this week (Mock growth)</span>
  </div>
@@ -155,32 +155,32 @@ export function Analytics() {
  </div>
 
  {/* 2. Active Users */}
- <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+ <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 transition-colors">
  <div className="flex items-center justify-between">
  <div>
- <p className="text-sm font-medium text-gray-600">Active Users</p>
- <p className="text-3xl font-bold text-gray-900 mt-2">{stats.activeUsers.toLocaleString()}</p>
+ <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Active Users</p>
+ <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{stats.activeUsers.toLocaleString()}</p>
  </div>
- <div className="bg-green-50 p-3 rounded-full"><TrendingUp className="h-6 w-6 text-green-600" /></div>
+ <div className="bg-green-50 dark:bg-green-900/30 p-3 rounded-full"><TrendingUp className="h-6 w-6 text-green-600 dark:text-green-400" /></div>
  </div>
  <div className="mt-4">
- <div className="flex items-center text-sm text-green-600">
+ <div className="flex items-center text-sm text-green-600 dark:text-green-400">
  <span>{Math.round((stats.activeUsers / stats.totalUsers) * 100)}% engagement rate (Live calc)</span>
  </div>
  </div>
  </div>
 
  {/* 3. Course Completions */}
- <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+ <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 transition-colors">
  <div className="flex items-center justify-between">
  <div>
- <p className="text-sm font-medium text-gray-600">Course Completions</p>
- <p className="text-3xl font-bold text-gray-900 mt-2">{stats.courseCompletions.toLocaleString()}</p>
+ <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Course Completions</p>
+ <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{stats.courseCompletions.toLocaleString()}</p>
  </div>
- <div className="bg-purple-50 p-3 rounded-full"><BookOpen className="h-6 w-6 text-purple-600" /></div>
+ <div className="bg-purple-50 dark:bg-purple-900/30 p-3 rounded-full"><BookOpen className="h-6 w-6 text-purple-600 dark:text-purple-400" /></div>
  </div>
  <div className="mt-4">
- <div className="flex items-center text-sm text-purple-600">
+ <div className="flex items-center text-sm text-purple-600 dark:text-purple-400">
  <Trophy className="h-4 w-4 mr-1" />
  <span>{stats.courseCompletions * 0.9}% retention rate (Mock)</span>
  </div>
@@ -188,16 +188,16 @@ export function Analytics() {
  </div>
 
  {/* 4. Video Views */}
- <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+ <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 transition-colors">
  <div className="flex items-center justify-between">
  <div>
- <p className="text-sm font-medium text-gray-600">Video Views</p>
- <p className="text-3xl font-bold text-gray-900 mt-2">{stats.videoViews.toLocaleString()}</p>
+ <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Video Views</p>
+ <p className="text-3xl font-bold text-gray-900 dark:text-white mt-2">{stats.videoViews.toLocaleString()}</p>
  </div>
- <div className="bg-amber-50 p-3 rounded-full"><Calendar className="h-6 w-6 text-amber-600" /></div>
+ <div className="bg-amber-50 dark:bg-amber-900/30 p-3 rounded-full"><Calendar className="h-6 w-6 text-amber-600 dark:text-amber-400" /></div>
  </div>
  <div className="mt-4">
- <div className="flex items-center text-sm text-amber-600">
+ <div className="flex items-center text-sm text-amber-600 dark:text-amber-400">
  <span>Avg. 24 min per session</span>
  </div>
  </div>
@@ -207,10 +207,10 @@ export function Analytics() {
  {/* Charts */}
  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
  {/* User Growth Chart */}
- <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+ <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 transition-colors">
  <div className="flex items-center justify-between mb-6">
- <h3 className="text-lg font-semibold text-gray-900">User Growth</h3>
- <button className="text-gray-400 hover:text-gray-600">
+ <h3 className="text-lg font-semibold text-gray-900 dark:text-white">User Growth</h3>
+ <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
  <Filter className="h-4 w-4" />
  </button>
  </div>
@@ -218,14 +218,14 @@ export function Analytics() {
  <div className="h-64 flex items-end justify-between space-x-2">
  {chartData.map((data, index) => (
  <div key={index} className="flex flex-col items-center space-y-2 flex-1">
- <div className="w-full bg-gray-200 rounded-t-lg relative" style={{ height: '200px' }}>
+ <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-t-lg relative" style={{ height: '200px' }}>
  <div 
  className="bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-lg absolute bottom-0 w-full transition-all"
  style={{ height: `${(data.count / 150) * 200}px` }}
  ></div>
  </div>
- <span className="text-xs text-gray-500 font-medium">{data.count}</span>
- <span className="text-xs text-gray-400">
+ <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">{data.count}</span>
+ <span className="text-xs text-gray-400 dark:text-gray-500">
  {new Date(data.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
  </span>
  </div>
@@ -234,10 +234,10 @@ export function Analytics() {
  </div>
 
  {/* Course Completions Chart */}
- <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+ <div className="bg-white dark:bg-gray-900 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 transition-colors">
  <div className="flex items-center justify-between mb-6">
- <h3 className="text-lg font-semibold text-gray-900">Course Completions</h3>
- <button className="text-gray-400 hover:text-gray-600">
+ <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Course Completions</h3>
+ <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
  <Filter className="h-4 w-4" />
  </button>
  </div>
@@ -245,14 +245,14 @@ export function Analytics() {
  <div className="h-64 flex items-end justify-between space-x-2">
  {completionsChart.map((data, index) => (
  <div key={index} className="flex flex-col items-center space-y-2 flex-1">
- <div className="w-full bg-gray-200 rounded-t-lg relative" style={{ height: '200px' }}>
+ <div className="w-full bg-gray-200 dark:bg-gray-800 rounded-t-lg relative" style={{ height: '200px' }}>
  <div 
  className="bg-gradient-to-t from-green-500 to-green-400 rounded-t-lg absolute bottom-0 w-full transition-all"
  style={{ height: `${(data.completed / 50) * 200}px` }}
  ></div>
  </div>
- <span className="text-xs text-gray-500 font-medium">{data.completed}</span>
- <span className="text-xs text-gray-400">
+ <span className="text-xs text-gray-500 dark:text-gray-400 font-medium">{data.completed}</span>
+ <span className="text-xs text-gray-400 dark:text-gray-500">
  {new Date(data.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
  </span>
  </div>
@@ -262,59 +262,59 @@ export function Analytics() {
  </div>
 
  {/* Detailed Performance Metrics */}
- <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
- <h3 className="text-lg font-semibold text-gray-900 mb-6">Detailed Performance Metrics</h3>
+ <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-100 dark:border-gray-800 p-6 transition-colors">
+ <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-6">Detailed Performance Metrics</h3>
  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
  <div className="space-y-4">
- <h4 className="font-medium text-gray-900">User Engagement</h4>
+ <h4 className="font-medium text-gray-900 dark:text-white">User Engagement</h4>
  <div className="space-y-3">
  <div className="flex justify-between items-center">
- <span className="text-sm text-gray-600">Daily Active Users</span>
- <span className="font-medium">{metrics?.dailyActiveUsers ?? 'N/A'}</span>
+ <span className="text-sm text-gray-600 dark:text-gray-400">Daily Active Users</span>
+ <span className="font-medium dark:text-white">{metrics?.dailyActiveUsers ?? 'N/A'}</span>
  </div>
  <div className="flex justify-between items-center">
- <span className="text-sm text-gray-600">Weekly Active Users</span>
- <span className="font-medium">89 (Mock)</span>
+ <span className="text-sm text-gray-600 dark:text-gray-400">Weekly Active Users</span>
+ <span className="font-medium dark:text-white">89 (Mock)</span>
  </div>
  <div className="flex justify-between items-center">
- <span className="text-sm text-gray-600">Monthly Active Users</span>
- <span className="font-medium">134 (Mock)</span>
+ <span className="text-sm text-gray-600 dark:text-gray-400">Monthly Active Users</span>
+ <span className="font-medium dark:text-white">134 (Mock)</span>
  </div>
  </div>
  </div>
 
  <div className="space-y-4">
- <h4 className="font-medium text-gray-900">Learning Progress</h4>
+ <h4 className="font-medium text-gray-900 dark:text-white">Learning Progress</h4>
  <div className="space-y-3">
  <div className="flex justify-between items-center">
- <span className="text-sm text-gray-600">Avg. Completion Rate</span>
- <span className="font-medium">72% (Mock)</span>
+ <span className="text-sm text-gray-600 dark:text-gray-400">Avg. Completion Rate</span>
+ <span className="font-medium dark:text-white">72% (Mock)</span>
  </div>
  <div className="flex justify-between items-center">
- <span className="text-sm text-gray-600">Avg. Quiz Score</span>
- <span className="font-medium">{metrics?.avgQuizScore ?? 'N/A'}%</span>
+ <span className="text-sm text-gray-600 dark:text-gray-400">Avg. Quiz Score</span>
+ <span className="font-medium dark:text-white">{metrics?.avgQuizScore ?? 'N/A'}%</span>
  </div>
  <div className="flex justify-between items-center">
- <span className="text-sm text-gray-600">Time to Complete</span>
- <span className="font-medium">5.2 days (Mock)</span>
+ <span className="text-sm text-gray-600 dark:text-gray-400">Time to Complete</span>
+ <span className="font-medium dark:text-white">5.2 days (Mock)</span>
  </div>
  </div>
  </div>
 
  <div className="space-y-4">
- <h4 className="font-medium text-gray-900">Platform Health</h4>
+ <h4 className="font-medium text-gray-900 dark:text-white">Platform Health</h4>
  <div className="space-y-3">
  <div className="flex justify-between items-center">
- <span className="text-sm text-gray-600">System Uptime</span>
- <span className="font-medium text-green-600">{metrics?.systemUptime ?? 'N/A'}%</span>
+ <span className="text-sm text-gray-600 dark:text-gray-400">System Uptime</span>
+ <span className="font-medium text-green-600 dark:text-green-400">{metrics?.systemUptime ?? 'N/A'}%</span>
  </div>
  <div className="flex justify-between items-center">
- <span className="text-sm text-gray-600">Avg. Load Time</span>
- <span className="font-medium">{metrics?.avgLoadTime ?? 'N/A'}s</span>
+ <span className="text-sm text-gray-600 dark:text-gray-400">Avg. Load Time</span>
+ <span className="font-medium dark:text-white">{metrics?.avgLoadTime ?? 'N/A'}s</span>
  </div>
  <div className="flex justify-between items-center">
- <span className="text-sm text-gray-600">Error Rate</span>
- <span className="font-medium text-green-600">{metrics?.errorRate ?? 'N/A'}%</span>
+ <span className="text-sm text-gray-600 dark:text-gray-400">Error Rate</span>
+ <span className="font-medium text-green-600 dark:text-green-400">{metrics?.errorRate ?? 'N/A'}%</span>
  </div>
  </div>
  </div>

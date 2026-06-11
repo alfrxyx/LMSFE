@@ -58,13 +58,13 @@ export function StudentBySemester() {
   }
 
   return (
-    <div className="w-full flex flex-col gap-10 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm min-h-screen">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-gray-50/50 p-8 rounded-[2.5rem] border border-gray-100/50 shrink-0">
+    <div className="w-full flex flex-col gap-10 p-6 md:p-10 bg-white dark:bg-gray-950 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm min-h-screen transition-colors duration-300">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-gray-50/50 dark:bg-gray-900/40 p-8 rounded-[2.5rem] border border-gray-100/50 dark:border-gray-800 shrink-0">
         <div>
-          <h1 className="text-4xl font-black text-gray-900 tracking-tight uppercase flex items-center gap-3">
-            Daftar Mahasiswa <Users className="h-10 w-10 text-blue-600" />
+          <h1 className="text-4xl font-black text-gray-900 dark:text-white tracking-tight uppercase flex items-center gap-3">
+            Daftar Mahasiswa <Users className="h-10 w-10 text-blue-600 dark:text-blue-400" />
           </h1>
-          <p className="text-gray-500 font-medium italic mt-1">Data seluruh mahasiswa terdaftar berdasarkan angkatan semester.</p>
+          <p className="text-gray-500 dark:text-gray-400 font-medium italic mt-1">Data seluruh mahasiswa terdaftar berdasarkan angkatan semester.</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
@@ -73,13 +73,13 @@ export function StudentBySemester() {
             <input 
               type="text" 
               placeholder="Cari Nama atau NIM..."
-              className="w-full pl-11 pr-4 py-2.5 bg-white border border-gray-100 rounded-xl text-xs font-bold focus:border-blue-500 outline-none transition-all shadow-sm"
+              className="w-full pl-11 pr-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl text-xs font-bold dark:text-white focus:border-blue-500 outline-none transition-all shadow-sm"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <select 
-            className="px-4 py-2.5 bg-white border border-gray-100 rounded-xl text-xs font-bold focus:border-blue-500 outline-none shadow-sm"
+            className="px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl text-xs font-bold dark:text-white focus:border-blue-500 outline-none shadow-sm"
             value={semesterFilter}
             onChange={(e) => setSemesterFilter(e.target.value)}
           >
@@ -96,11 +96,11 @@ export function StudentBySemester() {
           Object.keys(groupedBySemester).sort().map(semester => (
             <div key={semester} className="space-y-4">
               <div className="flex items-center gap-4">
-                <div className="bg-blue-600 text-white px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-100">
+                <div className="bg-blue-600 text-white px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-lg shadow-blue-100 dark:shadow-none">
                   SEMESTER {semester}
                 </div>
-                <div className="h-px flex-1 bg-gray-100"></div>
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                <div className="h-px flex-1 bg-gray-100 dark:bg-gray-800"></div>
+                <span className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
                   {groupedBySemester[semester].length} MAHASISWA
                 </span>
               </div>
@@ -113,10 +113,10 @@ export function StudentBySemester() {
                       setSelectedStudent(student);
                       setIsDetailModalOpen(true);
                     }}
-                    className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group"
+                    className="bg-white dark:bg-gray-900 p-5 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer group"
                   >
                     <div className="flex items-start gap-4">
-                      <div className="h-12 w-12 rounded-xl bg-gray-50 flex items-center justify-center text-blue-600 font-black text-lg border border-gray-100 group-hover:bg-blue-600 group-hover:text-white transition-all overflow-hidden">
+                      <div className="h-12 w-12 rounded-xl bg-gray-50 dark:bg-gray-800 flex items-center justify-center text-blue-600 dark:text-blue-400 font-black text-lg border border-gray-100 dark:border-gray-700 group-hover:bg-blue-600 group-hover:text-white transition-all overflow-hidden">
                         {student.avatar ? (
                           <img src={student.avatar} alt={student.name} className="h-full w-full object-cover" />
                         ) : (
@@ -124,25 +124,25 @@ export function StudentBySemester() {
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-black text-gray-900 text-sm truncate uppercase tracking-tight">{student.name}</h3>
+                        <h3 className="font-black text-gray-900 dark:text-white text-sm truncate uppercase tracking-tight">{student.name}</h3>
                         <div className="flex flex-col gap-1 mt-2">
-                          <div className="flex items-center gap-2 text-gray-500 text-[10px] font-bold uppercase tracking-widest">
+                          <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-[10px] font-bold uppercase tracking-widest">
                             <Hash size={12} className="text-gray-400" />
                             {student.nim || 'N/A'}
                           </div>
-                          <div className="flex items-center gap-2 text-gray-500 text-[10px] font-bold uppercase tracking-widest">
+                          <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-[10px] font-bold uppercase tracking-widest">
                             <Mail size={12} className="text-gray-400" />
                             <span className="truncate">{student.email}</span>
                           </div>
                         </div>
                       </div>
                     </div>
-                    <div className="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between">
+                    <div className="mt-4 pt-4 border-t border-gray-50 dark:border-gray-800 flex items-center justify-between">
                       <div className="flex items-center gap-1.5">
                         <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Status: Aktif</span>
+                        <span className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Status: Aktif</span>
                       </div>
-                      <div className="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-1 rounded-md uppercase tracking-tight">
+                      <div className="text-[10px] font-black text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded-md uppercase tracking-tight">
                         {student.points} XP
                       </div>
                     </div>
@@ -152,9 +152,9 @@ export function StudentBySemester() {
             </div>
           ))
         ) : (
-          <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-200">
-            <Users className="h-12 w-12 text-gray-200 mx-auto mb-4" />
-            <p className="text-gray-400 font-bold uppercase text-[10px] tracking-widest">Tidak ada mahasiswa ditemukan</p>
+          <div className="text-center py-20 bg-white dark:bg-gray-900 rounded-3xl border border-dashed border-gray-200 dark:border-gray-800 transition-colors">
+            <Users className="h-12 w-12 text-gray-200 dark:text-gray-700 mx-auto mb-4" />
+            <p className="text-gray-400 dark:text-gray-500 font-bold uppercase text-[10px] tracking-widest">Tidak ada mahasiswa ditemukan</p>
           </div>
         )}
       </div>

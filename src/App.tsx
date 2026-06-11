@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from 'react';
 import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AppProvider } from './contexts/AppContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { Layout } from './components/Layout/Layout';
 import { Toaster } from 'sonner';
 import { Loader2 } from 'lucide-react';
@@ -195,6 +196,7 @@ const router = createBrowserRouter([
 
 function App() {
  return (
+ <ThemeProvider>
  <AuthProvider>
  <AppProvider>
  <Toaster position="top-center" richColors />
@@ -206,6 +208,7 @@ function App() {
  />
  </AppProvider>
  </AuthProvider>
+ </ThemeProvider>
  );
 }
 

@@ -15,7 +15,7 @@ export function Layout({ children }: LayoutProps) {
  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
  return (
- <div className="min-h-screen bg-[#F8F9FB] flex">
+ <div className="min-h-screen bg-[#F8F9FB] dark:bg-gray-950 flex transition-colors duration-300">
  {/* Achievement & XP Popups Global */}
  <AchievementOverlay />
  <XPAnimator />
