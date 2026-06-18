@@ -25,8 +25,8 @@ const Analytics = lazy(() => import('./components/Admin/Analytics').then(module 
 const AdminSettings = lazy(() => import('./components/Admin/AdminSettings').then(module => ({ default: module.AdminSettings })));
 const StudentBySemester = lazy(() => import('./components/Admin/StudentBySemester').then(module => ({ default: module.StudentBySemester })));
 
-// Teacher Lazy Load
-const TeacherDashboard = lazy(() => import('./components/Teacher/TeacherDashboard').then(module => ({ default: module.TeacherDashboard })));
+// Dosen Lazy Load
+const DosenDashboard = lazy(() => import('./components/Dosen/DosenDashboard').then(module => ({ default: module.DosenDashboard })));
 
 // =======================================================
 // HELPER: Custom Route Components
@@ -65,7 +65,7 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
  return <SuspenseLayout>{children}</SuspenseLayout>;
 }
 
-function TeacherRoute({ children }: { children: React.ReactNode }) {
+function DosenRoute({ children }: { children: React.ReactNode }) {
  const { user, isLoading } = useAuth();
  if (isLoading) return <LoadingScreen />;
  if (!user || (user.role !== 'dosen' && user.role !== 'admin')) {
@@ -80,7 +80,7 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
  if (!user) return <SuspenseLayout>{children}</SuspenseLayout>;
  
  if (user.role === 'admin') return <Navigate to="/admin/dashboard" />;
- if (user.role === 'dosen') return <Navigate to="/teacher/dashboard" />;
+ if (user.role === 'dosen') return <Navigate to="/dosen/dashboard" />;
  return <Navigate to="/dashboard" />;
 }
 
@@ -90,7 +90,7 @@ function IndexRedirect() {
  if (!user) return <Navigate to="/login" />;
  
  if (user.role === 'admin') return <Navigate to="/admin/dashboard" />;
- if (user.role === 'dosen') return <Navigate to="/teacher/dashboard" />;
+ if (user.role === 'dosen') return <Navigate to="/dosen/dashboard" />;
  return <Navigate to="/dashboard" />;
 }
 
@@ -136,20 +136,20 @@ const router = createBrowserRouter([
  element: <ProtectedRoute><Layout><Profile /></Layout></ProtectedRoute>,
  },
  {
- path: "/teacher/dashboard",
- element: <TeacherRoute><Layout><TeacherDashboard tab="overview" /></Layout></TeacherRoute>,
+ path: "/dosen/dashboard",
+ element: <DosenRoute><Layout><DosenDashboard tab="overview" /></Layout></DosenRoute>,
  },
  {
- path: "/teacher/grading",
- element: <TeacherRoute><Layout><TeacherDashboard tab="submissions" /></Layout></TeacherRoute>,
+ path: "/dosen/grading",
+ element: <DosenRoute><Layout><DosenDashboard tab="submissions" /></Layout></DosenRoute>,
  },
  {
- path: "/teacher/discipline",
- element: <TeacherRoute><Layout><TeacherDashboard tab="discipline" /></Layout></TeacherRoute>,
+ path: "/dosen/discipline",
+ element: <DosenRoute><Layout><DosenDashboard tab="discipline" /></Layout></DosenRoute>,
  },
  {
  path: "/admin/content",
- element: <TeacherRoute><Layout><ContentManagement /></Layout></TeacherRoute>,
+ element: <DosenRoute><Layout><ContentManagement /></Layout></DosenRoute>,
  },
  {
  path: "/admin",
@@ -169,11 +169,11 @@ const router = createBrowserRouter([
  },
  {
  path: "/admin/students-by-semester",
- element: <TeacherRoute><Layout><StudentBySemester /></Layout></TeacherRoute>,
+ element: <DosenRoute><Layout><StudentBySemester /></Layout></DosenRoute>,
  },
  {
  path: "/admin/settings",
- element: <TeacherRoute><Layout><AdminSettings /></Layout></TeacherRoute>,
+ element: <DosenRoute><Layout><AdminSettings /></Layout></DosenRoute>,
  },
  {
  path: "*",

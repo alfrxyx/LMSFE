@@ -97,7 +97,7 @@ export function ContentManagement() {
     try {
       setStatsLoading(true);
       setIsStatsModalOpen(true);
-      const res = await api.get(`/teacher/levels/${levelId}/stats`);
+      const res = await api.get(`/dosen/levels/${levelId}/stats`);
       setMaterialStats(res.data);
     } catch (e) {
       toast.error("Gagal memuat statistik materi");
@@ -110,7 +110,7 @@ export function ContentManagement() {
   const handleNudge = async (userId: number, levelId: number) => {
     try {
       setNudgingId(userId);
-      await api.post('/teacher/remind-student', { user_id: userId, level_id: levelId });
+      await api.post('/dosen/remind-student', { user_id: userId, level_id: levelId });
       toast.success("Email pengingat berhasil dikirim!");
     } catch (e) {
       toast.error("Gagal mengirim pengingat");
@@ -1585,3 +1585,6 @@ export function ContentManagement() {
           </div>,
           document.body,
         )}
+    </div>
+  );
+}

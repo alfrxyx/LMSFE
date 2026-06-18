@@ -18,7 +18,8 @@ export function StudentMonitoring() {
   const fetchMonitoringData = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/teacher/monitoring');
+      const response = await
+      api.get('/dosen/monitoring');
       setStudents(response.data.data);
     } catch (error) {
       console.error("Gagal mengambil data monitoring:", error);

@@ -45,7 +45,8 @@ export function GradingModal({ submission, isOpen, onClose, onSuccess }: Grading
       // agar backend tidak perlu migrasi kolom baru, namun data tersimpan.
       const formattedFeedback = `RUBRIC_DATA:${JSON.stringify(rubric)}|FEEDBACK:${feedback}`;
       
-      await api.post(`/teacher/assignments/${submission.id}/grade`, {
+      await
+      api.post(`/dosen/assignments/${submission.id}/grade`, {
         earned_points: earnedPoints,
         feedback: formattedFeedback
       });

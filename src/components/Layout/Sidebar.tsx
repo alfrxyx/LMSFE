@@ -41,9 +41,9 @@ export function Sidebar() {
 
     if (user.role === 'dosen') {
       return [
-        { name: 'Dashboard', href: '/teacher/dashboard', icon: Home },
+        { name: 'Dashboard', href: '/dosen/dashboard', icon: Home },
         { name: 'Leaderboard', href: '/leaderboard', icon: Trophy },
-        { name: 'Penilaian', href: '/teacher/grading', icon: ClipboardCheck },
+        { name: 'Penilaian', href: '/dosen/grading', icon: ClipboardCheck },
         { name: 'Daftar Mahasiswa', href: '/admin/students-by-semester', icon: GraduationCap },
         { name: 'Kelola Materi', href: '/admin/content', icon: BookOpen },
         { name: 'Pengaturan', href: '/admin/settings', icon: Settings },

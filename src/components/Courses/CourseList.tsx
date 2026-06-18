@@ -7,6 +7,7 @@ import {
   Loader2,
   ChevronRight,
   Sparkles,
+  Lock,
 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -51,12 +52,6 @@ export function CourseList() {
     );
   }
 
-  // List of available semesters based on user role/semester
-  const availableSemesters = ["1", "2", "3", "4", "5", "6", "7", "8"].filter((sem) => {
-    if (user?.role === "admin" || user?.role === "dosen") return true;
-    return parseInt(sem) <= parseInt(user?.semester || "1");
-  });
-
   return (
     <div className="w-full flex flex-col gap-8 p-6 md:p-10 bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm min-h-screen transition-colors duration-300">
       {/* HEADER SECTION */}
@@ -89,7 +84,12 @@ export function CourseList() {
           /* SEMESTER SELECTION GRID */
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {["1", "2", "3", "4", "5", "6", "7", "8"].map((sem) => {
-              const isLocked = !availableSemesters.includes(sem);
+              const studentSemester = parseInt(user?.semester || "1");
+              const currentSem = parseInt(sem);
+              const isLocked = user?.role === "student" && currentSem > studentSemester;
+              const isActive = user?.role === "student" && currentSem === studentSemester;
+              const isPast = user?.role === "student" && currentSem < studentSemester;
+              
               const courseCount = courses.filter(c => c.semester.toString() === sem).length;
 
               return (
@@ -100,29 +100,50 @@ export function CourseList() {
                   className={`relative overflow-hidden p-8 rounded-[2.5rem] border-2 transition-all text-left group flex flex-col justify-between h-56 ${
                     isLocked 
                       ? 'bg-gray-50 dark:bg-gray-800 border-gray-100 dark:border-gray-800 opacity-60 cursor-not-allowed' 
-                      : 'bg-white dark:bg-gray-900 border-gray-50 dark:border-gray-800 hover:border-blue-500 hover:shadow-2xl hover:shadow-blue-100 active:scale-95'
+                      : isActive
+                        ? 'bg-blue-600 border-blue-400 shadow-2xl shadow-blue-200 dark:shadow-none scale-[1.02] z-10'
+                        : 'bg-white dark:bg-gray-900 border-gray-50 dark:border-gray-800 hover:border-blue-500 hover:shadow-2xl hover:shadow-blue-100 active:scale-95'
                   }`}
                 >
                   <div className="space-y-1">
-                    <p className={`text-[10px] font-black uppercase tracking-widest ${isLocked ? 'text-gray-400 dark:text-gray-500' : 'text-blue-500'}`}>
-                      {isLocked ? 'BELUM TERBUKA' : 'PJKR UM'}
+                    <p className={`text-[10px] font-black uppercase tracking-widest ${
+                      isLocked ? 'text-gray-400 dark:text-gray-500' : 
+                      isActive ? 'text-blue-100' :
+                      'text-blue-500'
+                    }`}>
+                      {isLocked ? 'TERKUNCI 🔒' : isActive ? 'SEMESTER AKTIF' : isPast ? 'RIWAYAT MATERI' : 'PJKR UM'}
                     </p>
-                    <h3 className={`text-3xl font-black tracking-tighter ${isLocked ? 'text-gray-400 dark:text-gray-500' : 'text-gray-900 dark:text-white'}`}>
+                    <h3 className={`text-3xl font-black tracking-tighter ${
+                      isLocked ? 'text-gray-400 dark:text-gray-500' : 
+                      isActive ? 'text-white' :
+                      'text-gray-900 dark:text-white'
+                    }`}>
                       Semester {sem}
                     </h3>
                   </div>
 
                   <div className="flex items-center justify-between mt-auto">
-                    <div className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest ${isLocked ? 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500' : 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'}`}>
+                    <div className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest ${
+                      isLocked ? 'bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500' : 
+                      isActive ? 'bg-white/20 text-white backdrop-blur-md' :
+                      'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400'
+                    }`}>
                       {courseCount} Materi
                     </div>
-                    <div className={`p-3 rounded-2xl transition-all ${isLocked ? 'bg-gray-100 dark:bg-gray-800 text-gray-300 dark:text-gray-600' : 'bg-gray-900 dark:bg-gray-800 text-white group-hover:bg-blue-600'}`}>
-                      <ChevronRight size={18} />
+                    <div className={`p-3 rounded-2xl transition-all ${
+                      isLocked ? 'bg-gray-100 dark:bg-gray-800 text-gray-300 dark:text-gray-600' : 
+                      isActive ? 'bg-white text-blue-600 shadow-lg' :
+                      'bg-gray-900 dark:bg-gray-800 text-white group-hover:bg-blue-600'
+                    }`}>
+                      {isLocked ? <Lock size={18} /> : <ChevronRight size={18} />}
                     </div>
                   </div>
 
-                  {/* Glass Decor */}
-                  {!isLocked && (
+                  {/* Visual Decor */}
+                  {isActive && (
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
+                  )}
+                  {!isLocked && !isActive && (
                     <div className="absolute top-0 right-0 w-32 h-32 bg-blue-600/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-blue-600/10 transition-colors"></div>
                   )}
                 </button>

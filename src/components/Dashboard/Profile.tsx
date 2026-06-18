@@ -74,7 +74,7 @@ export function Profile() {
                 </h1>
                 <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-[10px] font-black px-3 py-1.5 rounded-xl uppercase tracking-[0.15em] border border-blue-100 dark:border-blue-900 shadow-sm">
                   <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
-                  {user.role === 'admin' ? 'Administrator Platform' : user.role === 'teacher' || user.role === 'dosen' ? 'Dosen Pengampu' : 'Mahasiswa Aktif'}
+                  {user.role === 'admin' ? 'Administrator Platform' : user.role === 'dosen' ? 'Dosen Pengampu' : 'Mahasiswa Aktif'}
                 </div>
               </div>
 
