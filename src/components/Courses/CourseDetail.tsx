@@ -335,44 +335,50 @@ export function CourseDetail() {
  };
 
  const handleQuizSubmit = async () => {
- if (!activeLevel.questions || activeLevel.questions.length === 0) return;
- if (!isPreviousLevelCompleted()) {
-   toast.error(`Selesaikan ${course.levels.find((l: any) => l.order === activeLevel.order - 1)?.title} terlebih dahulu!`);
-   return;
- }
- 
- setSubmitting(true);
- try {
- const response = await api.post(`/levels/${activeLevel.id}/complete`, {
- answers: quizAnswers
- });
+  if (!activeLevel.questions || activeLevel.questions.length === 0) return;
+  if (!isPreviousLevelCompleted()) {
+    toast.error(`Selesaikan ${course.levels.find((l: any) => l.order === activeLevel.order - 1)?.title} terlebih dahulu!`);
+    return;
+  }
+   setSubmitting(true);
+   try {
+     const response = await api.post(`/levels/${activeLevel.id}/complete`, {
+       answers: quizAnswers
+     });
 
- const { score, xp_gained, new_level } = response.data;
- setQuizScore(score);
- setQuizSubmitted(true);
+     if (response.data.success === false) {
+       setQuizScore(response.data.score);
+       setQuizSubmitted(true);
+       toast.error(response.data.message || "Anda tidak lulus kuis. Silakan coba lagi.");
+       return;
+     }
 
- toast.success(`LULUS KUIS! +${xp_gained} XP didapatkan.`);
- setActiveLevel(prev => ({ ...prev, is_completed: true }));
+     const { score, xp_gained, new_level } = response.data;
+     setQuizScore(score);
+     setQuizSubmitted(true);
 
- if (new_level > user?.level) {
- setNewLevel(new_level);
- setShowLevelUp(true);
- }
+     toast.success(`LULUS KUIS! +${xp_gained} XP didapatkan.`);
+     setActiveLevel(prev => ({ ...prev, is_completed: true }));
 
- checkAuth(); 
- fetchCourseDetail();
- } catch (error: any) {
- const errMsg = error.response?.data?.message || "Gagal mengirim jawaban kuis";
- if (error.response?.status === 422) {
- setQuizScore(error.response.data.score);
- setQuizSubmitted(true);
- toast.error(errMsg);
- } else {
- toast.error(errMsg);
- }
- } finally {
- setSubmitting(false);
- }
+     if (new_level > user?.level) {
+       setNewLevel(new_level);
+       setShowLevelUp(true);
+     }
+
+     checkAuth(); 
+     fetchCourseDetail();
+   } catch (error: any) {
+     const errMsg = error.response?.data?.message || "Gagal mengirim jawaban kuis";
+     if (error.response?.status === 422) {
+       setQuizScore(error.response.data.score);
+       setQuizSubmitted(true);
+       toast.error(errMsg);
+     } else {
+       toast.error(errMsg);
+     }
+   } finally {
+     setSubmitting(false);
+   }
  };
 
  const handleSubmitTask = async (e?: React.FormEvent, bypassLink: boolean = false) => {
