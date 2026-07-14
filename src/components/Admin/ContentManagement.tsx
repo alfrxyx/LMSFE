@@ -87,6 +87,8 @@ export function ContentManagement() {
     sendAnnouncement: true, // Default true untuk materi baru
   });
 
+  const [rubricCriteria, setRubricCriteria] = useState<{ key: string; label: string; max_score: number }[]>([]);
+
   // --- MATERIAL STATS MODAL STATES ---
   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
   const [materialStats, setMaterialStats] = useState<any>(null);
@@ -284,6 +286,13 @@ export function ContentManagement() {
         formData.append(key, value.toString());
     });
     if (pdfFile) formData.append("pdf", pdfFile);
+    
+    // Append rubric if activity type is assignment
+    if (levelForm.activity_type === "assignment") {
+      formData.append("rubric", JSON.stringify(rubricCriteria));
+    } else {
+      formData.append("rubric", "");
+    }
     try {
       const url =
         isEditLevelMode && selectedLevelId
@@ -347,6 +356,7 @@ export function ContentManagement() {
       deadline: "",
       sendAnnouncement: true,
     });
+    setRubricCriteria([]);
     setIsEditLevelMode(false);
     setIsLevelModalOpen(true);
   };
@@ -1347,6 +1357,85 @@ export function ContentManagement() {
                       </div>
                     )}
 
+                    {levelForm.activity_type === "assignment" && (
+                      <div className="space-y-4 p-5 bg-gray-50 dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-700">
+                        <div className="flex justify-between items-center">
+                          <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest block">
+                            Rubrik Penilaian Tugas (Kustom)
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newCrit = {
+                                key: `crit_${Date.now()}`,
+                                label: `Kriteria Baru ${rubricCriteria.length + 1}`,
+                                max_score: 5,
+                              };
+                              setRubricCriteria([...rubricCriteria, newCrit]);
+                            }}
+                            className="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest hover:underline"
+                          >
+                            + Tambah Kriteria
+                          </button>
+                        </div>
+
+                        {rubricCriteria.length === 0 ? (
+                          <p className="text-[10px] text-gray-400 dark:text-gray-500 italic">
+                            * Belum ada kriteria kustom. Sistem akan menggunakan kriteria PJKR standar (Awalan, Pelaksanaan, Akhiran).
+                          </p>
+                        ) : (
+                          <div className="space-y-3">
+                            {rubricCriteria.map((crit, idx) => (
+                              <div
+                                key={crit.key}
+                                className="flex items-center gap-3 bg-white dark:bg-gray-800 p-3 rounded-xl border border-gray-100 dark:border-gray-700"
+                              >
+                                <input
+                                  type="text"
+                                  required
+                                  placeholder="Nama Kriteria (misal: Kelenturan)"
+                                  className="flex-1 bg-transparent text-xs font-bold outline-none text-gray-900 dark:text-white"
+                                  value={crit.label}
+                                  onChange={(e) => {
+                                    const next = [...rubricCriteria];
+                                    next[idx].label = e.target.value;
+                                    setRubricCriteria(next);
+                                  }}
+                                />
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[9px] text-gray-400 dark:text-gray-500 uppercase font-black">Max:</span>
+                                  <select
+                                    className="bg-gray-50 dark:bg-gray-900 border border-gray-100 dark:border-gray-700 text-xs font-bold rounded p-1 outline-none text-gray-900 dark:text-white"
+                                    value={crit.max_score}
+                                    onChange={(e) => {
+                                      const next = [...rubricCriteria];
+                                      next[idx].max_score = parseInt(e.target.value);
+                                      setRubricCriteria(next);
+                                    }}
+                                  >
+                                    {[1, 2, 3, 4, 5, 10, 20, 50, 100].map((val) => (
+                                      <option key={val} value={val}>
+                                        {val}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setRubricCriteria(rubricCriteria.filter((_, i) => i !== idx));
+                                  }}
+                                  className="text-red-500 hover:text-red-700 transition-colors"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     {/* Checkbox Kirim Pengumuman */}
                     <div className="pt-4">
                       <label className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-gray-900 rounded-2xl border-2 border-transparent hover:border-blue-100 dark:hover:border-blue-900 cursor-pointer transition-all">
@@ -1457,6 +1546,7 @@ export function ContentManagement() {
                                 deadline: lvl.deadline ? lvl.deadline.substring(0, 16) : "",
                                 sendAnnouncement: false, // Default false saat edit agar tidak spam
                               });
+                              setRubricCriteria(lvl.rubric || []);
                               setIsEditLevelMode(true);
                               setIsLevelModalOpen(true);
                             }}

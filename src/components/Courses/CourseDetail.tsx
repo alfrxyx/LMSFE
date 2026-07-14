@@ -70,6 +70,37 @@ function EvaluationDetail({ level, onClose }: { level: any, onClose: () => void 
     }
   }
 
+  // Get criteria to render for student view
+  const getStudentCriteriaList = () => {
+    const customCriteria = level.rubric;
+    if (customCriteria && Array.isArray(customCriteria) && customCriteria.length > 0) {
+      return customCriteria.map((crit: any, idx: number) => {
+        const val = rubric ? rubric[crit.key] : 0;
+        // Cycle colors and backgrounds for visual variety
+        const colorSchemes = [
+          { color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/20' },
+          { color: 'text-indigo-600', bg: 'bg-indigo-50 dark:bg-indigo-900/20' },
+          { color: 'text-purple-600', bg: 'bg-purple-50 dark:bg-purple-900/20' }
+        ];
+        const scheme = colorSchemes[idx % colorSchemes.length];
+        return {
+          label: crit.label.toUpperCase(),
+          val: val !== undefined ? val : 0,
+          max: crit.max_score || 5,
+          color: scheme.color,
+          bg: scheme.bg
+        };
+      });
+    }
+
+    // Fallback standard PJKR
+    return [
+      { label: 'AWALAN', val: rubric ? rubric.prep : 0, max: 5, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/20' },
+      { label: 'PELAKSANAAN', val: rubric ? rubric.exec : 0, max: 5, color: 'text-indigo-600', bg: 'bg-indigo-50 dark:bg-indigo-900/20' },
+      { label: 'AKHIRAN', val: rubric ? rubric.follow : 0, max: 5, color: 'text-purple-600', bg: 'bg-purple-50 dark:bg-purple-900/20' }
+    ];
+  };
+
   return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/90 backdrop-blur-xl animate-in fade-in duration-300">
       <div className="bg-white dark:bg-gray-900 w-full max-w-2xl rounded-[3rem] shadow-2xl overflow-hidden flex flex-col border border-white/20 dark:border-gray-800 animate-in zoom-in-95 duration-500 max-h-[90vh] transition-colors duration-300">
@@ -93,19 +124,23 @@ function EvaluationDetail({ level, onClose }: { level: any, onClose: () => void 
           {rubric ? (
             <div className="space-y-8">
                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {[
-                    { label: 'AWALAN', val: rubric.prep, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/20' },
-                    { label: 'PELAKSANAAN', val: rubric.exec, color: 'text-indigo-600', bg: 'bg-indigo-50 dark:bg-indigo-900/20' },
-                    { label: 'AKHIRAN', val: rubric.follow, color: 'text-purple-600', bg: 'bg-purple-50 dark:bg-purple-900/20' }
-                  ].map((item) => (
-                    <div key={item.label} className={`${item.bg} p-6 rounded-[2rem] text-center border border-white dark:border-gray-800 shadow-sm`}>
+                  {getStudentCriteriaList().map((item) => (
+                    <div key={item.label} className={`${item.bg} p-6 rounded-[2rem] text-center border border-white dark:border-gray-800 shadow-sm flex flex-col justify-between`}>
                        <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2">{item.label}</p>
-                       <div className="flex items-center justify-center gap-1 mb-2">
-                          {[1,2,3,4,5].map(s => (
-                            <Star key={s} size={12} className={s <= item.val ? `${item.color} fill-current` : 'text-gray-200 dark:text-gray-700'} />
-                          ))}
-                       </div>
-                       <p className={`text-3xl font-black ${item.color}`}>{item.val}<span className="text-sm opacity-50">/5</span></p>
+                       
+                       {item.max <= 10 ? (
+                         <div className="flex items-center justify-center gap-1 mb-2 flex-wrap">
+                            {Array.from({ length: item.max }, (_, i) => i + 1).map(s => (
+                              <Star key={s} size={12} className={s <= item.val ? `${item.color} fill-current text-yellow-400` : 'text-gray-200 dark:text-gray-700'} />
+                            ))}
+                         </div>
+                       ) : (
+                         <div className="w-full bg-gray-200 dark:bg-gray-700 h-1.5 rounded-full overflow-hidden mb-2">
+                           <div className="bg-blue-600 h-full" style={{ width: `${(item.val / item.max) * 100}%` }}></div>
+                         </div>
+                       )}
+
+                       <p className={`text-3xl font-black ${item.color}`}>{item.val}<span className="text-sm opacity-50 font-normal">/{item.max}</span></p>
                     </div>
                   ))}
                </div>

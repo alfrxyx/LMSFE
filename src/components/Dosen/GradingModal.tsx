@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { 
   X, Youtube, Star, Send, Loader2, MessageSquare, 
@@ -19,12 +19,32 @@ export function GradingModal({ submission, isOpen, onClose, onSuccess }: Grading
   const [feedback, setFeedback] = useState("");
   const [earnedPoints, setEarnedPoints] = useState(submission?.level?.xp_reward || 100);
   
-  // Rubric States (Scale 1-5)
-  const [rubric, setRubric] = useState({
-    prep: 5,
-    exec: 5,
-    follow: 5
-  });
+  // Dynamic Rubric State
+  const [rubric, setRubric] = useState<Record<string, number>>({});
+
+  useEffect(() => {
+    if (submission) {
+      setFeedback("");
+      setEarnedPoints(submission.level?.xp_reward || 100);
+      
+      // Initialize dynamic rubric scores
+      const criteria = submission.level?.rubric;
+      if (criteria && Array.isArray(criteria) && criteria.length > 0) {
+        const initialRubric: Record<string, number> = {};
+        criteria.forEach((crit: any) => {
+          initialRubric[crit.key] = crit.max_score || 5;
+        });
+        setRubric(initialRubric);
+      } else {
+        // Fallback standard PJKR
+        setRubric({
+          prep: 5,
+          exec: 5,
+          follow: 5
+        });
+      }
+    }
+  }, [submission]);
 
   if (!isOpen || !submission) return null;
 
@@ -34,6 +54,24 @@ export function GradingModal({ submission, isOpen, onClose, onSuccess }: Grading
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
     const match = url.match(regExp);
     return (match && match[2].length === 11) ? match[2] : url;
+  };
+
+  const getCriteriaList = () => {
+    const customCriteria = submission?.level?.rubric;
+    if (customCriteria && Array.isArray(customCriteria) && customCriteria.length > 0) {
+      return customCriteria.map((crit: any) => ({
+        key: crit.key,
+        label: crit.label,
+        desc: `Nilai maksimal: ${crit.max_score}`,
+        max: crit.max_score || 5
+      }));
+    }
+    // Fallback standard PJKR
+    return [
+      { key: 'prep', label: 'Tahap Awalan', desc: 'Posisi awal & kesiapan', max: 5 },
+      { key: 'exec', label: 'Tahap Pelaksanaan', desc: 'Kebenaran teknik gerakan', max: 5 },
+      { key: 'follow', label: 'Tahap Akhiran', desc: 'Keseimbangan & posisi akhir', max: 5 }
+    ];
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -135,37 +173,68 @@ export function GradingModal({ submission, isOpen, onClose, onSuccess }: Grading
                   <CheckCircle2 size={16} className="text-green-500" /> Penilaian Rubrik
                 </h4>
                 
-                {[
-                  { key: 'prep', label: 'Tahap Awalan', desc: 'Posisi awal & kesiapan' },
-                  { key: 'exec', label: 'Tahap Pelaksanaan', desc: 'Kebenaran teknik gerakan' },
-                  { key: 'follow', label: 'Tahap Akhiran', desc: 'Keseimbangan & posisi akhir' }
-                ].map((item) => (
-                  <div key={item.key} className="space-y-2.5 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <p className="text-[10px] font-black text-gray-900 uppercase">{item.label}</p>
-                        <p className="text-[8px] text-gray-400 font-medium">{item.desc}</p>
+                {getCriteriaList().map((item) => {
+                  const currentScore = rubric[item.key] !== undefined ? rubric[item.key] : item.max;
+                  const scoresRange = Array.from({ length: item.max }, (_, i) => i + 1);
+
+                  return (
+                    <div key={item.key} className="space-y-2.5 p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <p className="text-[10px] font-black text-gray-900 uppercase">{item.label}</p>
+                          <p className="text-[8px] text-gray-400 font-medium">{item.desc}</p>
+                        </div>
+                        <span className="text-lg font-black text-blue-600">
+                          {currentScore}
+                          <span className="text-xs text-gray-400 font-medium">/{item.max}</span>
+                        </span>
                       </div>
-                      <span className="text-lg font-black text-blue-600">{(rubric as any)[item.key]}</span>
+                      
+                      {item.max <= 10 ? (
+                        <div className="flex flex-wrap gap-1.5">
+                          {scoresRange.map(score => (
+                            <button
+                              key={score}
+                              type="button"
+                              onClick={() => setRubric({...rubric, [item.key]: score})}
+                              className={`p-2 rounded-lg transition-all border flex items-center justify-center ${
+                                currentScore === score 
+                                ? 'bg-blue-600 text-white border-blue-600 shadow-md' 
+                                : 'bg-white text-gray-400 border-gray-100 hover:border-blue-200'
+                              }`}
+                              style={{ minWidth: '2.5rem' }}
+                            >
+                              <Star size={12} className={score <= currentScore ? 'fill-current text-yellow-400' : ''} />
+                              {item.max > 5 && <span className="text-[9px] ml-1 font-bold">{score}</span>}
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-4">
+                          <input
+                            type="range"
+                            min="1"
+                            max={item.max}
+                            value={currentScore}
+                            onChange={(e) => setRubric({...rubric, [item.key]: parseInt(e.target.value)})}
+                            className="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                          />
+                          <input
+                            type="number"
+                            min="1"
+                            max={item.max}
+                            value={currentScore}
+                            onChange={(e) => {
+                              const val = Math.min(item.max, Math.max(1, parseInt(e.target.value) || 1));
+                              setRubric({...rubric, [item.key]: val});
+                            }}
+                            className="w-16 p-1 text-center font-black border rounded-lg bg-white dark:bg-gray-800 text-xs text-gray-900 dark:text-white"
+                          />
+                        </div>
+                      )}
                     </div>
-                    <div className="flex gap-2">
-                      {[1,2,3,4,5].map(score => (
-                        <button
-                          key={score}
-                          type="button"
-                          onClick={() => setRubric({...rubric, [item.key]: score})}
-                          className={`flex-1 py-2 rounded-lg transition-all border ${
-                            (rubric as any)[item.key] === score 
-                            ? 'bg-blue-600 text-white border-blue-600 shadow-md' 
-                            : 'bg-white text-gray-400 border-gray-100 hover:border-blue-200'
-                          }`}
-                        >
-                          <Star size={12} className={score <= (rubric as any)[item.key] ? 'fill-current' : ''} />
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* XP & FEEDBACK */}
