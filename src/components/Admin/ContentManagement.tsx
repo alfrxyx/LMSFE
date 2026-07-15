@@ -19,17 +19,233 @@ import {
   Activity,
   ChevronRight,
   Bell,
+  GraduationCap,
 } from "lucide-react";
 import { useAuth } from "../../contexts/AuthContext";
 import { useApp } from "../../contexts/AppContext";
 import { toast } from "sonner";
 import { ConfirmModal } from "../Shared/ConfirmModal";
 
+function ClassroomManager() {
+  const { courses } = useApp();
+  const [classrooms, setClassrooms] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [name, setName] = useState('');
+  const [selectedCourseId, setSelectedCourseId] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [filterCourseId, setFilterCourseId] = useState('all');
+
+  const filteredClassrooms = classrooms.filter(
+    (cls) => filterCourseId === 'all' || cls.course_id?.toString() === filterCourseId
+  );
+
+  const fetchClassrooms = async () => {
+    setLoading(true);
+    try {
+      const res = await api.get('/admin/classrooms');
+      setClassrooms(res.data.data);
+    } catch (e) {
+      toast.error("Gagal memuat daftar kelas.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchClassrooms();
+  }, []);
+
+  useEffect(() => {
+    if (courses.length > 0 && !selectedCourseId) {
+      setSelectedCourseId(courses[0].id.toString());
+    }
+  }, [courses, selectedCourseId]);
+
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim() || !selectedCourseId) return;
+    setSaving(true);
+    try {
+      const res = await api.post('/admin/classrooms', {
+        name: name.trim(),
+        course_id: parseInt(selectedCourseId)
+      });
+      toast.success(res.data.message);
+      setName('');
+      fetchClassrooms();
+    } catch (e: any) {
+      toast.error(e.response?.data?.message || "Gagal membuat kelas.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!confirm("Apakah Anda yakin ingin menghapus kelas ini? Mahasiswa di kelas ini akan kehilangan asosiasi kelas mereka.")) return;
+    try {
+      await api.delete(`/admin/classrooms/${id}`);
+      toast.success("Kelas berhasil dihapus.");
+      fetchClassrooms();
+    } catch (e) {
+      toast.error("Gagal menghapus kelas.");
+    }
+  };
+
+  return (
+    <div className="space-y-8 animate-in fade-in duration-300">
+      {/* Grid: Create Class & Class List */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        {/* CREATE CLASS FORM */}
+        <div className="lg:col-span-1 bg-white dark:bg-gray-800 p-8 rounded-[2rem] border border-gray-100 dark:border-gray-700 shadow-xl shadow-gray-200/30 dark:shadow-none space-y-6">
+          <div>
+            <h3 className="text-lg font-black text-gray-900 dark:text-white uppercase tracking-tight">Buat Kelas Baru</h3>
+            <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest mt-1">
+              Tambahkan kelas baru untuk mahasiswa paralel.
+            </p>
+          </div>
+
+          <form onSubmit={handleCreate} className="space-y-4">
+            <div>
+              <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 block">
+                Nama Kelas / Offering
+              </label>
+              <input
+                type="text"
+                required
+                placeholder="Contoh: Offering A, Kelas B, PJKR A"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full p-4 bg-gray-50 dark:bg-gray-900 rounded-xl border-2 border-transparent focus:border-blue-500 focus:bg-white dark:focus:bg-gray-900 transition-all font-semibold outline-none text-gray-900 dark:text-white text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 block">
+                Mata Kuliah
+              </label>
+              <select
+                value={selectedCourseId}
+                onChange={(e) => setSelectedCourseId(e.target.value)}
+                className="w-full p-4 bg-gray-50 dark:bg-gray-900 rounded-xl border-2 border-transparent focus:border-blue-500 focus:bg-white dark:focus:bg-gray-900 transition-all font-bold outline-none text-gray-900 dark:text-white text-sm"
+              >
+                {courses.map(c => (
+                  <option key={c.id} value={c.id}>{c.title.toUpperCase()} (Semester {c.semester})</option>
+                ))}
+              </select>
+            </div>
+
+            <button
+              type="submit"
+              disabled={saving}
+              className="w-full py-4 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-xl font-black text-[10px] uppercase tracking-[0.2em] shadow-lg shadow-blue-100 dark:shadow-none transition-all active:scale-95"
+            >
+              {saving ? 'Menyimpan...' : 'Simpan Kelas'}
+            </button>
+          </form>
+        </div>
+
+        {/* CLASS LIST */}
+        <div className="lg:col-span-2 bg-white dark:bg-gray-800 p-8 md:p-10 rounded-[2rem] border border-gray-100 dark:border-gray-700 shadow-xl shadow-gray-200/30 dark:shadow-none">
+          <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h3 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Daftar Kelas Aktif</h3>
+              <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
+                Kelola token dan pantau jumlah mahasiswa kelas.
+              </p>
+            </div>
+            
+            <div className="flex items-center gap-2.5">
+              <select
+                value={filterCourseId}
+                onChange={(e) => setFilterCourseId(e.target.value)}
+                className="px-4 py-2.5 bg-gray-50 dark:bg-gray-900 text-[10px] font-black uppercase tracking-widest rounded-xl border border-transparent focus:border-blue-500 text-gray-700 dark:text-gray-300 outline-none"
+              >
+                <option value="all">SEMUA MATA KULIAH</option>
+                {courses.map(c => (
+                  <option key={c.id} value={c.id.toString()}>{c.title.toUpperCase()}</option>
+                ))}
+              </select>
+
+              <button
+                onClick={fetchClassrooms}
+                className="p-2.5 bg-gray-50 dark:bg-gray-900 text-gray-400 hover:text-blue-600 rounded-xl border transition-all shrink-0"
+                title="Refresh"
+              >
+                <Loader2 className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+              </button>
+            </div>
+          </div>
+
+          {loading && classrooms.length === 0 ? (
+            <div className="text-center py-20 flex flex-col items-center gap-4">
+              <Loader2 className="h-8 w-8 text-blue-600 animate-spin" />
+              <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest animate-pulse">Memuat Daftar Kelas...</p>
+            </div>
+          ) : filteredClassrooms.length === 0 ? (
+            <div className="text-center py-20 bg-gray-50 dark:bg-gray-900 rounded-[2rem] border-2 border-dashed border-gray-100 dark:border-gray-800">
+              <p className="text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest text-xs">Belum ada kelas untuk filter ini.</p>
+            </div>
+          ) : (
+            <div className="space-y-4 max-h-[55vh] overflow-y-auto pr-2 custom-scrollbar">
+              {filteredClassrooms.map((cls) => (
+                <div
+                  key={cls.id}
+                  className="flex items-center justify-between p-6 bg-gray-50 dark:bg-gray-900 rounded-2xl border border-transparent hover:border-blue-100 dark:hover:border-blue-900 hover:bg-white dark:hover:bg-gray-800 transition-all shadow-sm hover:shadow-md"
+                >
+                  <div className="flex items-center gap-6">
+                    <div className="h-12 w-12 bg-blue-600 text-white rounded-xl flex items-center justify-center font-black text-sm shrink-0">
+                      S{cls.semester}
+                    </div>
+                    <div>
+                      <h4 className="font-black text-gray-900 dark:text-white uppercase tracking-tight text-base leading-tight">
+                        {cls.name}
+                      </h4>
+                      {cls.course && (
+                        <p className="text-[10px] text-blue-600 dark:text-blue-400 font-bold uppercase tracking-wider mt-0.5">
+                          Mata Kuliah: {cls.course.title}
+                        </p>
+                      )}
+                      <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+                        <span 
+                          onClick={() => {
+                            navigator.clipboard.writeText(cls.code);
+                            toast.success("Kode kelas disalin!");
+                          }}
+                          className="text-[9px] font-black bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-300 px-2.5 py-1 rounded-lg uppercase tracking-widest cursor-pointer hover:bg-blue-200 transition-all"
+                          title="Klik untuk menyalin"
+                        >
+                          Token: {cls.code}
+                        </span>
+                        <span className="text-[9px] font-black bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 px-2.5 py-1 rounded-lg uppercase tracking-widest">
+                          {cls.students_count || 0} Mahasiswa
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleDelete(cls.id)}
+                    className="p-3 text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/20 rounded-xl transition-all border border-transparent hover:border-red-100 dark:hover:border-red-900"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
 export function ContentManagement() {
   const { user } = useAuth();
   const { courses, fetchCourses, isLoading: appLoading } = useApp();
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"courses" | "videos" | "quizzes">(
+  const [activeTab, setActiveTab] = useState<"courses" | "videos" | "quizzes" | "classrooms">(
     "courses",
   );
 
@@ -384,6 +600,7 @@ export function ContentManagement() {
     { id: "courses", name: "Courses", icon: FileText },
     { id: "videos", name: "Videos", icon: Play },
     { id: "quizzes", name: "Quiz Builder", icon: HelpCircle },
+    { id: "classrooms", name: "Classrooms", icon: GraduationCap },
   ];
 
   return (
@@ -891,6 +1108,10 @@ export function ContentManagement() {
           <div className="text-center py-40 bg-gray-50/50 dark:bg-gray-800/50 rounded-3xl border-2 border-dashed border-gray-200 dark:border-gray-700 text-gray-400 dark:text-gray-500 font-black uppercase text-xs tracking-widest">
             Fitur Manajemen Video Segera Hadir
           </div>
+        )}
+
+        {activeTab === "classrooms" && (
+          <ClassroomManager />
         )}
       </div>
       

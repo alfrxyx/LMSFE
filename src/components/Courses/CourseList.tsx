@@ -86,9 +86,13 @@ export function CourseList() {
             {["1", "2", "3", "4", "5", "6", "7", "8"].map((sem) => {
               const studentSemester = parseInt(user?.semester || "1");
               const currentSem = parseInt(sem);
-              const isLocked = user?.role === "student" && currentSem > studentSemester;
+              
+              // Cari apakah ada kelas yang diikuti mahasiswa di semester ini
+              const hasClassInSemester = user?.classrooms?.some((cls: any) => cls.semester === currentSem);
+              
+              const isLocked = user?.role === "student" && currentSem > studentSemester && !hasClassInSemester;
               const isActive = user?.role === "student" && currentSem === studentSemester;
-              const isPast = user?.role === "student" && currentSem < studentSemester;
+              const isPast = user?.role === "student" && (currentSem < studentSemester || hasClassInSemester);
               
               const courseCount = courses.filter(c => c.semester.toString() === sem).length;
 

@@ -19,14 +19,30 @@ export function Leaderboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<'all' | 'weekly' | 'monthly'>('all');
-  const [semesterFilter, setSemesterFilter] = useState<string>('all');
+  const [classrooms, setClassrooms] = useState<any[]>([]);
+  const [selectedClassroom, setSelectedClassroom] = useState<string>('all');
+
+  // Load classrooms for dosen/admin selection
+  useEffect(() => {
+    if (user?.role === 'admin' || user?.role === 'dosen') {
+      const fetchClassrooms = async () => {
+        try {
+          const res = await api.get('/admin/classrooms');
+          setClassrooms(res.data.data);
+        } catch (e) {
+          console.error("Gagal memuat kelas:", e);
+        }
+      };
+      fetchClassrooms();
+    }
+  }, [user]);
 
   useEffect(() => {
     const fetchRankings = async () => {
       try {
         setIsLoading(true);
-        const response = await api.get(`/leaderboard?filter=${filter}&semester=${semesterFilter}`);
-        // Pastikan mengambil data dari response.data.data jika menggunakan API Resource Laravel
+        const classFilter = user?.role === 'student' ? (user.classroom_id || '') : selectedClassroom;
+        const response = await api.get(`/leaderboard?filter=${filter}&classroom_id=${classFilter}`);
         const data = response.data.data || response.data;
         setRankings(data);
         setError(null);
@@ -39,7 +55,7 @@ export function Leaderboard() {
     };
 
     fetchRankings();
-  }, [filter, semesterFilter]);
+  }, [filter, selectedClassroom, user]);
 
   const getRankIcon = (rank: number) => {
     switch (rank) {
@@ -85,22 +101,27 @@ export function Leaderboard() {
           <h1 className="text-4xl font-black text-gray-900 dark:text-white tracking-tight flex items-center gap-3 leading-none">
             Leaderboard <Trophy className="h-10 w-10 text-yellow-500" />
           </h1>
-          <p className="mt-3 text-gray-500 dark:text-gray-400 font-medium italic">Siapa mahasiswa PJKR dengan poin XP tertinggi hari ini?</p>
+          <p className="mt-3 text-gray-500 dark:text-gray-400 font-medium italic">
+            {user?.role === 'student' && user?.classroom 
+              ? `Papan peringkat kompetisi Kelas ${user.classroom.name} (Semester ${user.classroom.semester})` 
+              : 'Pilih kelas di kanan untuk menyaring peringkat mahasiswa.'}
+          </p>
         </div>
 
         <div className="flex flex-col md:flex-row gap-4">
-          {/* Semester Filter - Hanya muncul untuk Admin/Dosen */}
+          {/* Classroom Filter - Hanya muncul untuk Admin/Dosen */}
           {(user?.role === 'admin' || user?.role === 'dosen') && (
-            <div className="flex bg-gray-100/80 dark:bg-gray-800/80 p-1.5 rounded-2xl overflow-x-auto max-w-full md:max-w-none no-scrollbar border border-gray-100 dark:border-gray-700 shadow-inner">
-              {['all', '1', '2', '3', '4', '5', '6', '7', '8'].map(sem => (
-                <button
-                  key={`sem-${sem}`}
-                  onClick={() => setSemesterFilter(sem)}
-                  className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-tight transition-all whitespace-nowrap ${semesterFilter === sem ? 'bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 shadow-sm' : 'text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300'}`}
-                >
-                  {sem === 'all' ? 'SEMUA' : `S${sem}`}
-                </button>
-              ))}
+            <div className="flex items-center">
+              <select
+                value={selectedClassroom}
+                onChange={(e) => setSelectedClassroom(e.target.value)}
+                className="px-4 py-3 bg-gray-100 dark:bg-gray-800 text-[10px] font-black uppercase tracking-widest rounded-2xl border border-transparent focus:border-blue-500 text-gray-700 dark:text-gray-300 outline-none"
+              >
+                <option value="all">PILIH KELAS (SEMUA)</option>
+                {classrooms.map(cls => (
+                  <option key={cls.id} value={cls.id}>{cls.name.toUpperCase()} (S{cls.semester})</option>
+                ))}
+              </select>
             </div>
           )}
 

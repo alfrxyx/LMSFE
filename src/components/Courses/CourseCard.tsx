@@ -9,13 +9,52 @@ import {
   Lock,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface CourseCardProps {
   course: any;
 }
 
 export function CourseCard({ course }: CourseCardProps) {
-  const canAccess = course.can_access !== false;
+  const { updateUser } = useAuth();
+  const [showJoinModal, setShowJoinModal] = React.useState(false);
+  const [code, setCode] = React.useState('');
+  const [joining, setJoining] = React.useState(false);
+  const [error, setError] = React.useState('');
+
+  const isJoined = course.is_joined !== false;
+  const canAccess = isJoined && course.can_access !== false;
+
+  const handleJoin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!code.trim()) return;
+    setJoining(true);
+    setError('');
+    try {
+      const res = await api.post('/classrooms/join', { code: code.trim() });
+      if (res.data.status === 'success') {
+        toast.success(res.data.message);
+        setShowJoinModal(false);
+        updateUser(res.data.user);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      } else {
+        setError(res.data.message || 'Gagal bergabung ke kelas.');
+      }
+    } catch (err: any) {
+      const serverMessage = err.response?.data?.message;
+      if (err.response?.status === 401) {
+        setError('Sesi Anda telah berakhir. Silakan logout dan login kembali.');
+      } else if (err.response?.status === 403) {
+        setError(serverMessage || 'Anda tidak memiliki akses ke kelas ini.');
+      } else {
+        setError(serverMessage || 'Gagal terhubung ke server atau kode tidak valid.');
+      }
+    } finally {
+      setJoining(false);
+    }
+  };
 
   // Helper untuk menangani URL Gambar (Lokal vs Eksternal)
   const getImageUrl = (path: string) => {
@@ -69,7 +108,12 @@ export function CourseCard({ course }: CourseCardProps) {
         />
         
         {/* Lock Overlay */}
-        {!canAccess && (
+        {!isJoined ? (
+          <div className="absolute inset-0 bg-gray-900/50 backdrop-blur-[2px] flex flex-col items-center justify-center text-center p-4">
+            <Lock className="h-8 w-8 text-white mb-1.5" />
+            <p className="text-[10px] font-black text-white uppercase tracking-widest">Belum Masuk Kelas</p>
+          </div>
+        ) : !canAccess && (
           <div className="absolute inset-0 bg-gray-900/40 backdrop-blur-[2px] flex items-center justify-center">
             <div className="bg-white/90 p-4 rounded-2xl shadow-xl border border-white/50 ">
               <Lock className="h-8 w-8 text-gray-900" />
@@ -149,8 +193,15 @@ export function CourseCard({ course }: CourseCardProps) {
           </div>
         </div>
 
-        {/* PERBAIKAN TOMBOL: py-2.5 (sebelumnya py-4) dan rounded-lg agar lebih ramping */}
-        {canAccess ? (
+        {/* PERBAIKAN TOMBOL */}
+        {!isJoined ? (
+          <button
+            onClick={() => setShowJoinModal(true)}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg font-black text-[11px] tracking-[0.1em] transition-all flex items-center justify-center shadow-md shadow-blue-50 active:scale-95"
+          >
+            GABUNG KELAS MATA KULIAH
+          </button>
+        ) : canAccess ? (
           <Link
             to={`/courses/${course.id}`}
             aria-label={`Mulai materi ${course.title}`}
@@ -168,6 +219,57 @@ export function CourseCard({ course }: CourseCardProps) {
           </button>
         )}
       </div>
+
+      {/* JOIN MODAL */}
+      {showJoinModal && (
+        <div className="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[999] flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-[2rem] p-8 max-w-sm w-full border border-gray-100 dark:border-gray-700 shadow-2xl space-y-6 animate-in zoom-in-95 duration-200">
+            <div className="text-center space-y-2">
+              <h3 className="text-xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Gabung Kelas</h3>
+              <p className="text-xs text-blue-600 dark:text-blue-400 font-bold uppercase tracking-widest leading-relaxed">
+                {course.title}
+              </p>
+              <p className="text-[11px] text-gray-400 dark:text-gray-500 font-medium leading-relaxed">
+                Masukkan Kode Kelas dari Dosen Anda untuk membuka materi kuliah ini.
+              </p>
+            </div>
+
+            <form onSubmit={handleJoin} className="space-y-4">
+              <input
+                type="text"
+                required
+                value={code}
+                onChange={(e) => setCode(e.target.value.toUpperCase())}
+                placeholder="PJKR-XXXX"
+                className="w-full px-6 py-4 bg-gray-50 dark:bg-gray-900 text-center font-black uppercase text-base text-gray-900 dark:text-white border-2 border-gray-100 dark:border-gray-700 focus:border-blue-500 outline-none rounded-2xl transition-all tracking-wider"
+              />
+              
+              {error && <p className="text-xs text-red-500 font-bold uppercase tracking-wider text-center">{error}</p>}
+
+              <div className="grid grid-cols-2 gap-4">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowJoinModal(false);
+                    setError('');
+                    setCode('');
+                  }}
+                  className="w-full py-3 bg-gray-100 dark:bg-gray-750 text-gray-700 dark:text-gray-300 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all active:scale-95 text-center"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={joining}
+                  className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black text-[10px] uppercase tracking-widest transition-all active:scale-95 flex items-center justify-center"
+                >
+                  {joining ? 'Proses...' : 'Gabung'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -18,22 +18,22 @@ export function StudentManagement() {
  const [selectedStudent, setSelectedStudent] = useState<any | null>(null);
  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
- // Fetch data mahasiswa dari AdminController@indexUsers
- useEffect(() => {
- const fetchStudents = async () => {
- try {
- setLoading(true);
- const response = await api.get(`/admin/users?semester=${semesterFilter}`);
- setStudents(response.data);
- } catch (error) {
- console.error("Gagal mengambil data mahasiswa:", error);
- } finally {
- setLoading(false);
- }
- };
+  const fetchStudents = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get(`/admin/users?semester=${semesterFilter}`);
+      setStudents(response.data);
+    } catch (error) {
+      console.error("Gagal mengambil data mahasiswa:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
- if (token) fetchStudents();
- }, [token, semesterFilter]);
+  // Fetch data mahasiswa dari AdminController@indexUsers
+  useEffect(() => {
+    if (token) fetchStudents();
+  }, [token, semesterFilter]);
 
  // FIX: Filter pencarian mendukung pencarian berdasarkan NIM
  const filteredStudents = students.filter(student =>
@@ -196,6 +196,9 @@ export function StudentManagement() {
    onClose={() => {
      setIsDetailModalOpen(false);
      setSelectedStudent(null);
+   }}
+   onUpdate={() => {
+     fetchStudents();
    }}
  />
  </div>

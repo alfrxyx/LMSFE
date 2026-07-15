@@ -16,6 +16,13 @@ export interface User {
   current_streak: number;
   last_activity_date: string | null;
   avatar?: string;
+  classroom_id?: number; // Hubungan kelas skenario 2
+  classroom?: {
+    id: number;
+    name: string;
+    code: string;
+    semester: number;
+  };
   assignments?: any[];
   achievements?: any[];
   completedVideos?: string[];
@@ -29,7 +36,7 @@ export interface AuthContextType {
   token: string | null;
   isLoading: boolean;
   login: (nim: string, password: string) => Promise<boolean>; // Menggunakan nim
-  register: (nim: string, name: string, semester: string, phone: string, email: string, password: string) => Promise<boolean>;
+  register: (nim: string, name: string, classroomCode: string, phone: string, email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
   updateUser: (updates: Partial<User>) => void;
   checkAuth: () => Promise<void>;
@@ -92,13 +99,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Register mendukung kolom NIM, Semester, dan No HP
-  const register = async (nim: string, name: string, semester: string, phone: string, email: string, password: string): Promise<boolean> => {
+  // Register mendukung kolom NIM, Kode Kelas, dan No HP
+  const register = async (nim: string, name: string, classroomCode: string, phone: string, email: string, password: string): Promise<boolean> => {
     try {
       await api.post('/register', { 
         nim, 
         name, 
-        semester, 
+        classroom_code: classroomCode, 
         phone, 
         email, 
         password,
@@ -106,7 +113,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       return true;
     } catch (error: any) {
-      const message = error.response?.data?.message || 'Registrasi gagal';
+      const errors = error.response?.data?.errors;
+      let message = '';
+      if (errors) {
+        // Gabungkan seluruh pesan error spesifik jika ada
+        message = Object.values(errors).flat().join(' ');
+      } else {
+        message = error.response?.data?.message || 'Registrasi gagal';
+      }
+      // Bersihkan teks " (and X more error/s)" bawaan Laravel
+      message = message.replace(/\s*\(and \d+ more error(s)?\)/g, '');
       throw new Error(message);
     }
   };

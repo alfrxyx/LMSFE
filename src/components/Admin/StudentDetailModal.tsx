@@ -1,20 +1,79 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { 
   X, Mail, Phone, Hash, GraduationCap, 
   Award, Flame, Trophy, Star, BookOpen, 
   Youtube, CheckCircle2, Clock, AlertCircle,
-  ExternalLink, MessageCircle, Settings, Trash2, Bell
+  ExternalLink, MessageCircle, Settings, Trash2, Bell, Edit2
 } from 'lucide-react';
+import api from '../../api/axios';
+import { toast } from 'sonner';
 
 interface StudentDetailModalProps {
   student: any;
   isOpen: boolean;
   onClose: () => void;
+  onUpdate?: () => void;
 }
 
-export function StudentDetailModal({ student, isOpen, onClose }: StudentDetailModalProps) {
+export function StudentDetailModal({ student, isOpen, onClose, onUpdate }: StudentDetailModalProps) {
   const [activeTab, setActiveTab] = useState<'overview' | 'academic' | 'gamification'>('overview');
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: '',
+    nim: '',
+    email: '',
+    phone: '',
+    semester: '1'
+  });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (student) {
+      setEditForm({
+        name: student.name || '',
+        nim: student.nim || '',
+        email: student.email || '',
+        phone: student.phone || '',
+        semester: student.semester?.toString() || '1'
+      });
+      setIsEditMode(false);
+      setError('');
+    }
+  }, [student]);
+
+  const handleUpdateStudent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    setError('');
+    try {
+      const res = await api.put(`/admin/users/${student.id}`, {
+        name: editForm.name,
+        nim: editForm.nim,
+        email: editForm.email,
+        phone: editForm.phone,
+        semester: parseInt(editForm.semester)
+      });
+      if (res.data.status === 'success') {
+        toast.success('Data mahasiswa berhasil diperbarui!');
+        setIsEditMode(false);
+        if (onUpdate) onUpdate();
+        // Update local student object fields to keep header text instantly in sync
+        student.name = editForm.name;
+        student.nim = editForm.nim;
+        student.email = editForm.email;
+        student.phone = editForm.phone;
+        student.semester = parseInt(editForm.semester);
+      } else {
+        setError(res.data.message || 'Gagal memperbarui data mahasiswa.');
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Gagal menghubungi server.');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   if (!isOpen || !student) return null;
 
@@ -66,8 +125,12 @@ export function StudentDetailModal({ student, isOpen, onClose }: StudentDetailMo
             </div>
 
             <div className="flex gap-2">
-              <button className="p-3 bg-white/10 hover:bg-white/20 rounded-2xl transition-all border border-white/5 shadow-inner">
-                <Settings size={20} />
+              <button 
+                title="Edit Profil Mahasiswa"
+                onClick={() => setIsEditMode(!isEditMode)}
+                className={`p-3 rounded-2xl transition-all border border-white/5 shadow-inner ${isEditMode ? 'bg-blue-600 text-white' : 'bg-white/10 hover:bg-white/20'}`}
+              >
+                <Edit2 size={20} />
               </button>
               <button 
                 onClick={onClose}
@@ -80,28 +143,110 @@ export function StudentDetailModal({ student, isOpen, onClose }: StudentDetailMo
         </div>
 
         {/* TAB NAVIGATION */}
-        <div className="px-8 pt-4 bg-gray-50 border-b border-gray-100 shrink-0">
-          <div className="flex gap-2 overflow-x-auto no-scrollbar">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center gap-3 px-8 py-4 rounded-t-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all whitespace-nowrap ${
-                  activeTab === tab.id 
-                  ? "bg-white text-blue-600 border-x border-t border-gray-100 shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.05)]" 
-                  : "text-gray-400 hover:text-gray-600 hover:bg-gray-100/50"
-                }`}
-              >
-                <tab.icon size={14} />
-                {tab.name}
-              </button>
-            ))}
+        {!isEditMode && (
+          <div className="px-8 pt-4 bg-gray-50 border-b border-gray-100 shrink-0">
+            <div className="flex gap-2 overflow-x-auto no-scrollbar">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className={`flex items-center gap-3 px-8 py-4 rounded-t-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all whitespace-nowrap ${
+                    activeTab === tab.id 
+                    ? "bg-white text-blue-600 border-x border-t border-gray-100 shadow-[0_-4px_10px_-5px_rgba(0,0,0,0.05)]" 
+                    : "text-gray-400 hover:text-gray-600 hover:bg-gray-100/50"
+                  }`}
+                >
+                  <tab.icon size={14} />
+                  {tab.name}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* MODAL CONTENT - SCROLLABLE */}
         <div className="flex-1 overflow-y-auto p-8 custom-scrollbar bg-white">
-          {activeTab === 'overview' && (
+          {isEditMode ? (
+            <form onSubmit={handleUpdateStudent} className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+              {error && (
+                <div className="p-4 bg-red-50 text-red-600 text-xs font-bold rounded-2xl border border-red-100 flex items-center gap-2">
+                  <AlertCircle size={16} /> {error}
+                </div>
+              )}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Nama Lengkap</label>
+                  <input
+                    type="text"
+                    required
+                    value={editForm.name}
+                    onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 dark:border-gray-700 rounded-2xl text-sm font-semibold text-gray-900 focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">NIM Mahasiswa</label>
+                  <input
+                    type="text"
+                    required
+                    value={editForm.nim}
+                    onChange={(e) => setEditForm({ ...editForm, nim: e.target.value })}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 dark:border-gray-700 rounded-2xl text-sm font-semibold text-gray-900 focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Alamat Email</label>
+                  <input
+                    type="email"
+                    required
+                    value={editForm.email}
+                    onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 dark:border-gray-700 rounded-2xl text-sm font-semibold text-gray-900 focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Nomor Telepon / WA</label>
+                  <input
+                    type="text"
+                    value={editForm.phone}
+                    onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 dark:border-gray-700 rounded-2xl text-sm font-semibold text-gray-900 focus:outline-none focus:border-blue-500"
+                  />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Semester Akademik</label>
+                  <select
+                    value={editForm.semester}
+                    onChange={(e) => setEditForm({ ...editForm, semester: e.target.value })}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 dark:border-gray-700 rounded-2xl text-sm font-semibold text-gray-900 focus:outline-none focus:border-blue-500"
+                  >
+                    {["1", "2", "3", "4", "5", "6", "7", "8"].map((sem) => (
+                      <option key={sem} value={sem}>Semester {sem}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex gap-4 pt-6 border-t border-gray-100">
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="flex-1 py-4 bg-blue-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 disabled:opacity-50 transition-all"
+                >
+                  {saving ? 'Menyimpan...' : 'Simpan Perubahan'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsEditMode(false)}
+                  className="px-8 py-4 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all"
+                >
+                  Batal
+                </button>
+              </div>
+            </form>
+          ) : (
+            <>
+              {activeTab === 'overview' && (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Kontak Card */}
@@ -244,17 +389,21 @@ export function StudentDetailModal({ student, isOpen, onClose }: StudentDetailMo
               </div>
             </div>
           )}
+            </>
+          )}
         </div>
 
         {/* FOOTER ACTIONS */}
-        <div className="p-8 bg-gray-50 border-t border-gray-100 flex flex-wrap gap-4 shrink-0">
-          <button className="flex-1 flex items-center justify-center gap-3 px-8 py-5 bg-blue-600 text-white rounded-[1.75rem] font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95">
-            <Bell size={18} /> Kirim Notifikasi Akademik
-          </button>
-          <button className="flex items-center justify-center gap-3 px-8 py-5 bg-white text-red-600 border border-red-100 rounded-[1.75rem] font-black text-[10px] uppercase tracking-[0.2em] hover:bg-red-50 transition-all active:scale-95">
-            <Trash2 size={18} /> Blokir Mahasiswa
-          </button>
-        </div>
+        {!isEditMode && (
+          <div className="p-8 bg-gray-50 border-t border-gray-100 flex flex-wrap gap-4 shrink-0">
+            <button className="flex-1 flex items-center justify-center gap-3 px-8 py-5 bg-blue-600 text-white rounded-[1.75rem] font-black text-[10px] uppercase tracking-[0.2em] shadow-xl shadow-blue-100 hover:bg-blue-700 transition-all active:scale-95">
+              <Bell size={18} /> Kirim Notifikasi Akademik
+            </button>
+            <button className="flex items-center justify-center gap-3 px-8 py-5 bg-white text-red-600 border border-red-100 rounded-[1.75rem] font-black text-[10px] uppercase tracking-[0.2em] hover:bg-red-50 transition-all active:scale-95">
+              <Trash2 size={18} /> Blokir Mahasiswa
+            </button>
+          </div>
+        )}
       </div>
     </div>,
     document.body

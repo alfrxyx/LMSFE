@@ -3,7 +3,7 @@ import api from '../../api/axios';
 import { 
   Users, Search, Loader2, 
   Calendar, Award, Flame, Badge as BadgeIcon,
-  ChevronRight, CheckCircle2, Clock, BookOpen, ChevronDown
+  ChevronRight, CheckCircle2, Clock, BookOpen, ChevronDown, GraduationCap
 } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
 
@@ -13,13 +13,28 @@ export function StudentMonitoring() {
   const [searchTerm, setSearchTerm] = useState('');
   const [semesterFilter, setSemesterFilter] = useState('all');
   const [expandedId, setExpandedId] = useState<number | null>(null);
+
+  const [classrooms, setClassrooms] = useState<any[]>([]);
+  const [selectedClassroom, setSelectedClassroom] = useState('all');
+
   const { courses } = useApp();
 
-  const fetchMonitoringData = async () => {
+  const fetchClassrooms = async () => {
+    try {
+      const res = await api.get('/admin/classrooms');
+      setClassrooms(res.data.data || []);
+    } catch (e) {
+      console.error("Gagal mengambil data kelas:", e);
+    }
+  };
+
+  const fetchMonitoringData = async (classroomId: string = 'all') => {
     try {
       setLoading(true);
-      const response = await
-      api.get('/dosen/monitoring');
+      const url = classroomId === 'all' 
+        ? '/dosen/monitoring' 
+        : `/dosen/monitoring?classroom_id=${classroomId}`;
+      const response = await api.get(url);
       setStudents(response.data.data);
     } catch (error) {
       console.error("Gagal mengambil data monitoring:", error);
@@ -29,8 +44,27 @@ export function StudentMonitoring() {
   };
 
   useEffect(() => {
-    fetchMonitoringData();
+    fetchClassrooms();
   }, []);
+
+  // Filter daftar kelas di dropdown berdasarkan tombol semester yang aktif
+  const filteredClassrooms = classrooms.filter(cls => 
+    semesterFilter === 'all' || cls.semester.toString() === semesterFilter
+  );
+
+  // Jika kelas yang sedang terpilih tidak ada di daftar kelas yang tersaring, reset ke 'all'
+  useEffect(() => {
+    if (selectedClassroom !== 'all') {
+      const isClassroomVisible = filteredClassrooms.some(cls => cls.id.toString() === selectedClassroom);
+      if (!isClassroomVisible) {
+        setSelectedClassroom('all');
+      }
+    }
+  }, [semesterFilter, classrooms]);
+
+  useEffect(() => {
+    fetchMonitoringData(selectedClassroom);
+  }, [selectedClassroom]);
 
   const filteredStudents = students.filter(student => {
     const matchesSearch = student.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
@@ -49,8 +83,9 @@ export function StudentMonitoring() {
   return (
     <div className="space-y-6 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm">
       {/* Filters Area */}
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50 p-4 rounded-[2rem] border border-gray-100 shadow-inner">
-        <div className="relative w-full max-w-md">
+      <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50 p-4 rounded-[2rem] border border-gray-100 shadow-inner w-full">
+        {/* Search */}
+        <div className="relative flex-1 w-full max-w-md">
           <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
@@ -60,7 +95,27 @@ export function StudentMonitoring() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="flex bg-white p-1 rounded-2xl border border-gray-100 shadow-sm overflow-x-auto no-scrollbar">
+
+        {/* Classroom Dropdown Selector */}
+        <div className="relative w-full md:w-64">
+          <GraduationCap className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 font-bold" />
+          <select
+            value={selectedClassroom}
+            onChange={(e) => setSelectedClassroom(e.target.value)}
+            className="w-full pl-12 pr-10 py-3 bg-white border-2 border-transparent rounded-2xl text-xs font-black uppercase tracking-widest outline-none focus:border-blue-500 transition-all shadow-sm appearance-none cursor-pointer text-gray-700"
+          >
+            <option value="all">Semua Kelas</option>
+            {filteredClassrooms.map((cls: any) => (
+              <option key={cls.id} value={cls.id}>
+                {cls.name} ({cls.course?.title || 'Mata Kuliah'})
+              </option>
+            ))}
+          </select>
+          <ChevronDown className="absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 pointer-events-none" />
+        </div>
+
+        {/* Semester Buttons */}
+        <div className="flex bg-white p-1 rounded-2xl border border-gray-100 shadow-sm overflow-x-auto no-scrollbar max-w-full">
           {['all', '1', '2', '3', '4', '5', '6', '7', '8'].map(s => (
             <button
               key={s}

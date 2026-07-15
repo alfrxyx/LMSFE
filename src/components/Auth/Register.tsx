@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom'; 
 import { BookOpen, Mail, Lock, User, UserPlus, Hash, Phone, GraduationCap, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import api from '../../api/axios';
 
 export function Register() {
   const { register } = useAuth();
@@ -9,7 +10,7 @@ export function Register() {
   const [formData, setFormData] = useState({
     nim: '',
     name: '',
-    semester: '',
+    classroomCode: '',
     phone: '',
     email: '',
     password: '',
@@ -19,6 +20,38 @@ export function Register() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const [classInfo, setClassInfo] = useState<any | null>(null);
+  const [classLoading, setClassLoading] = useState(false);
+  const [classError, setClassError] = useState('');
+
+  useEffect(() => {
+    const code = formData.classroomCode.trim();
+    if (!code) {
+      setClassInfo(null);
+      setClassError('');
+      return;
+    }
+
+    // Debounce verifikasi kode kelas selama 500ms
+    const timer = setTimeout(async () => {
+      setClassLoading(true);
+      setClassError('');
+      setClassInfo(null);
+      try {
+        const response = await api.get(`/classrooms/verify/${code}`);
+        if (response.data.status === 'success') {
+          setClassInfo(response.data.classroom);
+        }
+      } catch (err: any) {
+        setClassError(err.response?.data?.message || 'Kode kelas tidak valid.');
+      } finally {
+        setClassLoading(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [formData.classroomCode]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +74,7 @@ export function Register() {
       await register(
         formData.nim,
         formData.name,
-        formData.semester,
+        formData.classroomCode,
         formData.phone,
         formData.email,
         formData.password
@@ -125,23 +158,51 @@ export function Register() {
               </div>
             </div>
 
-            {/* Row 2: Semester & No HP */}
+            {/* Row 2: Kode Kelas & No HP */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-gray-700 ml-1">Semester</label>
+                <label className="text-xs font-bold text-gray-700 ml-1">Kode Kelas (Opsional)</label>
                 <div className="relative group">
                   <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
-                  <select
-                    name="semester"
-                    required
-                    value={formData.semester}
+                  <input
+                    name="classroomCode"
+                    type="text"
+                    value={formData.classroomCode}
                     onChange={handleChange}
-                    className="w-full pl-11 pr-4 py-2.5 bg-gray-50 border-2 border-transparent rounded-xl focus:bg-white focus:border-blue-500 focus:outline-none transition-all text-sm text-gray-900 font-semibold appearance-none"
-                  >
-                    <option value="">Pilih Semester</option>
-                    {[1,2,3,4,5,6,7,8].map(s => <option key={s} value={s}>Semester {s}</option>)}
-                  </select>
+                    className="w-full pl-11 pr-4 py-2.5 bg-gray-50 border-2 border-transparent rounded-xl focus:bg-white focus:border-blue-500 focus:outline-none transition-all text-sm text-gray-900 font-semibold uppercase"
+                    placeholder="PJKR-XXXX"
+                  />
                 </div>
+
+                {/* Real-time Preview Card / Loading / Error */}
+                {classLoading && (
+                  <div className="flex items-center gap-2 mt-2 ml-1 text-xs text-gray-400 font-bold">
+                    <div className="h-3.5 w-3.5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                    Memverifikasi kode kelas...
+                  </div>
+                )}
+                {classError && (
+                  <div className="flex items-center gap-1.5 mt-2 ml-1 text-xs text-red-500 font-bold animate-in fade-in slide-in-from-top-1 duration-200">
+                    <AlertCircle className="h-3.5 w-3.5" />
+                    <span>{classError}</span>
+                  </div>
+                )}
+                {classInfo && (
+                  <div className="mt-3 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-800 rounded-2xl border border-blue-100 dark:border-gray-700 shadow-sm animate-in slide-in-from-top-2 duration-300">
+                    <p className="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-1.5 flex items-center gap-1">
+                      <span className="inline-block w-1.5 h-1.5 bg-green-500 rounded-full animate-ping"></span>
+                      ✓ Kelas Terdeteksi
+                    </p>
+                    <div className="space-y-1">
+                      <p className="text-xs font-black text-gray-800 dark:text-white uppercase tracking-tight">{classInfo.course_title}</p>
+                      <div className="flex items-center gap-2 text-[10px] font-extrabold text-gray-500 dark:text-gray-400">
+                        <span>Kelas {classInfo.name}</span>
+                        <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+                        <span>Semester {classInfo.semester}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-gray-700 ml-1">Nomor WhatsApp</label>

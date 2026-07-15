@@ -10,11 +10,79 @@ import { QuickActions } from './QuickActions';
 import { 
   BookOpen, Star, Trophy, ChevronRight, 
   Crown, Loader2, Megaphone, AlertCircle, 
-  Info, CheckCircle2, Flame, ChevronDown, ChevronUp
+  Info, CheckCircle2, Flame, ChevronDown, ChevronUp, Users, GraduationCap
 } from 'lucide-react';
 
+function ClassroomJoinInput({ onJoinSuccess }: { onJoinSuccess: (user: any) => void }) {
+  const [code, setCode] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
+  const handleJoin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!code.trim()) return;
+    setLoading(true);
+    setError('');
+    setSuccess('');
+    try {
+      const res = await api.post('/classrooms/join', { code: code.trim() });
+      if (res.data.status === 'success') {
+        setSuccess(res.data.message);
+        setTimeout(() => {
+          onJoinSuccess(res.data.user);
+        }, 1000);
+      } else {
+        setError(res.data.message || 'Gagal bergabung ke kelas.');
+      }
+    } catch (err: any) {
+      const serverMessage = err.response?.data?.message;
+      if (err.response?.status === 401) {
+        setError('Sesi Anda telah berakhir. Silakan logout dan login kembali.');
+      } else if (err.response?.status === 403) {
+        setError(serverMessage || 'Anda tidak memiliki akses ke kelas ini.');
+      } else {
+        setError(serverMessage || 'Gagal terhubung ke server atau kode tidak valid.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleJoin} className="space-y-4 max-w-sm mx-auto">
+      <input
+        type="text"
+        required
+        value={code}
+        onChange={(e) => setCode(e.target.value.toUpperCase())}
+        placeholder="PJKR-XXXX"
+        className="w-full px-6 py-4 bg-gray-50 dark:bg-gray-800 text-center font-black uppercase text-base text-gray-900 dark:text-white border-2 border-gray-100 dark:border-gray-700 focus:border-blue-500 outline-none rounded-2xl transition-all tracking-wider"
+      />
+      
+      {error && <p className="text-xs text-red-500 font-bold uppercase tracking-wider">{error}</p>}
+      {success && <p className="text-xs text-green-500 font-bold uppercase tracking-wider">{success}</p>}
+
+      <button
+        type="submit"
+        disabled={loading}
+        className="w-full py-4 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-blue-100 dark:shadow-none transition-all active:scale-95 flex items-center justify-center gap-2"
+      >
+        {loading ? (
+          <>
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span>Memproses...</span>
+          </>
+        ) : (
+          <span>Gabung Kelas Sekarang</span>
+        )}
+      </button>
+    </form>
+  );
+}
+
 export function Dashboard() {
-  const { user: authUser, isLoading: authLoading } = useAuth();
+  const { user: authUser, isLoading: authLoading, updateUser } = useAuth();
   const { fetchCourses } = useApp();
   const [announcements, setAnnouncements] = useState<any[]>([]);
   const [settings, setSettings] = useState<any>({
@@ -23,18 +91,34 @@ export function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [showAnnouncements, setShowAnnouncements] = useState(false);
 
+  const [adminStats, setAdminStats] = useState<any | null>(null);
+
+  const fetchAdminStats = async () => {
+    try {
+      const res = await api.get('/admin/stats');
+      setAdminStats(res.data);
+    } catch (e) {
+      console.error("Gagal mengambil statistik admin:", e);
+    }
+  };
+
   useEffect(() => {
     const init = async () => {
       setLoading(true);
-      await Promise.all([
-        fetchCourses(),
+      const promises: Promise<any>[] = [
         fetchAnnouncements(),
         fetchSettings()
-      ]);
+      ];
+      if (authUser?.role === 'student') {
+        promises.push(fetchCourses());
+      } else {
+        promises.push(fetchAdminStats());
+      }
+      await Promise.all(promises);
       setLoading(false);
     };
     init();
-  }, []);
+  }, [authUser]);
 
   const fetchAnnouncements = async () => {
     try {
@@ -66,6 +150,230 @@ export function Dashboard() {
   }
 
   const displayUser = authUser;
+
+  // Jika mahasiswa belum masuk kelas, kunci dashboard dan suruh masukkan kode kelas
+  if (displayUser && displayUser.role === 'student' && !displayUser.classroom_id) {
+    return (
+      <div className="w-full flex flex-col items-center justify-center p-6 md:p-10 min-h-[80vh]">
+        <div className="w-full max-w-2xl bg-white dark:bg-gray-900 rounded-[3rem] border border-gray-100 dark:border-gray-800 shadow-2xl p-10 md:p-14 text-center space-y-8 animate-in zoom-in-95 duration-500">
+          <div className="h-24 w-24 bg-blue-50 dark:bg-blue-900/20 rounded-[2.5rem] flex items-center justify-center mx-auto shadow-inner border border-white dark:border-gray-800 text-blue-600 dark:text-blue-400">
+            <BookOpen size={48} className="animate-pulse" />
+          </div>
+          
+          <div className="space-y-3">
+            <h2 className="text-3xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Selamat Datang!</h2>
+            <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-widest leading-relaxed max-w-md mx-auto">
+              GamifyLearn LMS Universitas Negeri Malang
+            </p>
+            <p className="text-sm text-gray-400 dark:text-gray-500 font-medium leading-relaxed max-w-md mx-auto mt-2">
+              Anda belum bergabung dengan kelas praktikum manapun. Silakan masukkan Kode Kelas dari Dosen Anda di bawah ini untuk membuka akses materi kuliah dan memulai pembelajaran.
+            </p>
+          </div>
+
+          <ClassroomJoinInput onJoinSuccess={(updatedUser) => updateUser(updatedUser)} />
+        </div>
+      </div>
+    );
+  }
+
+  // Jika dosen atau admin, tampilkan Dashboard khusus Dosen
+  if (displayUser && (displayUser.role === 'dosen' || displayUser.role === 'admin')) {
+    return (
+      <div className="w-full flex flex-col gap-6 md:gap-8 pb-10 p-6 md:p-10 bg-white dark:bg-gray-950 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm min-h-screen transition-colors duration-300">
+        {/* HEADER SECTION - Lecturer Ribbon */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-gray-50/50 dark:bg-gray-900/40 p-6 md:p-8 rounded-3xl md:rounded-[2.5rem] border border-gray-100/50 dark:border-gray-800/50 shrink-0">
+          <div className="flex items-center gap-4 md:gap-6">
+            <div className="h-12 w-12 md:h-14 md:h-14 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg md:text-xl shadow-md overflow-hidden shrink-0">
+              {displayUser.avatar ? (
+                <img src={displayUser.avatar} alt={displayUser.name} className="h-full w-full object-cover" />
+              ) : (
+                displayUser.name?.[0]
+              )}
+            </div>
+            <div className="min-w-0">
+              <h2 className="text-lg md:text-xl font-bold text-gray-900 dark:text-white truncate">{displayUser.name}</h2>
+              <p className="text-[10px] md:text-xs text-blue-600 dark:text-blue-400 font-extrabold uppercase tracking-wider">{displayUser.role === 'admin' ? 'Administrator' : 'Dosen Pengampu'}</p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-4 md:gap-10">
+            <div className="flex items-center gap-3">
+              <div className="p-2 md:p-2.5 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                <BookOpen size={16} className="text-blue-500 md:w-[18px] md:h-[18px]" />
+              </div>
+              <div>
+                <p className="text-[8px] md:text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest leading-none mb-1">Mata Kuliah</p>
+                <p className="text-xs md:text-sm font-black text-gray-900 dark:text-white leading-none">{adminStats?.total_courses || 0}</p>
+              </div>
+            </div>
+
+            <div className="h-8 md:h-10 w-px bg-gray-100 dark:bg-gray-800 hidden sm:block"></div>
+
+            <div className="flex items-center gap-3">
+              <div className="p-2 md:p-2.5 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+                <Users size={16} className="text-blue-500 md:w-[18px] md:h-[18px]" />
+              </div>
+              <div>
+                <p className="text-[8px] md:text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest leading-none mb-1">Mahasiswa</p>
+                <p className="text-xs md:text-sm font-black text-gray-900 dark:text-white leading-none">{adminStats?.total_students || 0}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* LECTURER BANNER */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl p-6 md:p-10 text-white shadow-xl group border border-white/10 min-h-[220px] flex flex-col justify-center">
+          <div className="absolute inset-2 bg-white/5 rounded-[2.5rem] backdrop-blur-[2px] pointer-events-none"></div>
+          <div className="absolute -right-8 -bottom-8 md:-right-10 md:-bottom-10 opacity-[0.04] group-hover:opacity-[0.12] scale-75 group-hover:scale-110 -rotate-12 transition-all duration-700 ease-out pointer-events-none">
+            <GraduationCap size={180} className="text-white md:w-[280px] md:h-[280px]" />
+          </div>
+          
+          <div className="relative z-10 space-y-4 max-w-[85%]">
+            <h2 className="text-xl md:text-3xl font-black uppercase tracking-tight">Panel Pemantauan Dosen</h2>
+            <p className="text-xs md:text-sm text-blue-100 max-w-xl">
+              Selamat datang di dashboard pengelolaan GamifyLearn. Di sini Anda dapat mengawasi kemajuan belajar mahasiswa, menilai tugas praktek, dan mengelola kelas praktikum Anda.
+            </p>
+            <div className="flex flex-wrap gap-3 pt-2">
+              <Link 
+                to="/student-management" 
+                className="inline-flex items-center gap-2 bg-white text-blue-600 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-50 transition-all shadow-md active:scale-95"
+              >
+                Kelola Mahasiswa
+              </Link>
+              <Link 
+                to="/content-management" 
+                className="inline-flex items-center gap-2 bg-blue-500 text-white px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-400 transition-all border border-blue-400/30 active:scale-95"
+              >
+                Kelola Kelas & Materi
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* LECTURER STATS CARDS */}
+        <section className="space-y-4">
+          <h3 className="text-[9px] font-black text-gray-400 uppercase tracking-[0.2em] px-1">Metrik Pembelajaran & Monitoring</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 uiverse-parent">
+            {[
+              {
+                name: 'Total Mahasiswa',
+                value: adminStats?.total_students || 0,
+                label: 'MAHASISWA AKTIF',
+                icon: Users,
+                color: 'text-blue-500'
+              },
+              {
+                name: 'Progres Kelas Rata-rata',
+                value: `${adminStats?.pedagogical_stats?.avg_class_progress || 0}%`,
+                label: 'KETUNTASAN BELAJAR',
+                icon: Trophy,
+                color: 'text-yellow-500'
+              },
+              {
+                name: 'Tugas Belum Dinilai',
+                value: adminStats?.pending_assignments || 0,
+                label: 'MEMBUTUHKAN PENILAIAN',
+                icon: Star,
+                color: 'text-orange-500'
+              },
+              {
+                name: 'Mahasiswa Rentan (At-Risk)',
+                value: adminStats?.pedagogical_stats?.at_risk_count || 0,
+                label: 'BELUM ADA PROGRES',
+                icon: AlertCircle,
+                color: 'text-red-500'
+              }
+            ].map((stat) => (
+              <div 
+                key={stat.name} 
+                className="uiverse-card bg-gradient-to-br from-blue-600 to-blue-700 min-h-[220px] rounded-[40px] shadow-xl border border-white/20 flex flex-col items-center justify-center text-center p-6 group overflow-hidden"
+              >
+                <div className="uiverse-glass !opacity-20"></div>
+                <div className="uiverse-content p-3 bg-white/20 backdrop-blur-md rounded-2xl mb-3 group-hover:scale-110 transition-transform">
+                  <stat.icon className="h-6 w-6 text-white" />
+                </div>
+                <div className="uiverse-content space-y-1">
+                  <span className="text-3xl font-black text-white tracking-tighter">
+                    {stat.value}
+                  </span>
+                  <p className="text-[9px] font-black text-blue-100 uppercase tracking-widest">
+                    {stat.label}
+                  </p>
+                </div>
+                <p className="uiverse-content mt-3 text-[9px] font-bold text-blue-200/60 uppercase tracking-[0.2em]">
+                  {stat.name}
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* DETAILED MONITORING SUMMARY PANEL */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-20">
+          {/* Pedagogis Card: Hard Materials */}
+          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800 p-6 md:p-8 shadow-sm">
+            <h3 className="text-[10px] md:text-[11px] font-black text-gray-900 dark:text-white uppercase tracking-widest mb-6 flex items-center gap-2">
+              <AlertCircle size={16} className="text-red-500" /> 3 Materi Paling Sulit Bagi Mahasiswa
+            </h3>
+            <div className="space-y-4">
+              {adminStats?.pedagogical_stats?.difficult_materials?.map((mat: any, idx: number) => (
+                <div key={idx} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700">
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-gray-900 dark:text-white truncate uppercase">{mat.title}</p>
+                    <p className="text-[9px] text-gray-400 font-extrabold uppercase mt-1">TINGKAT KESULITAN TINGGI</p>
+                  </div>
+                  <span className="text-[10px] font-black text-red-600 bg-red-50 dark:bg-red-950/20 px-3 py-1.5 rounded-full uppercase tracking-wider whitespace-nowrap">
+                    {mat.completions} Selesai
+                  </span>
+                </div>
+              ))}
+              {(!adminStats?.pedagogical_stats?.difficult_materials || adminStats.pedagogical_stats.difficult_materials.length === 0) && (
+                <p className="text-center py-10 text-xs font-bold text-gray-400 uppercase tracking-wider">
+                  Belum ada data materi sulit yang terkumpul.
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Quick Tasks & Monitoring Actions */}
+          <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800 p-6 md:p-8 shadow-sm">
+            <h3 className="text-[10px] md:text-[11px] font-black text-gray-900 dark:text-white uppercase tracking-widest mb-6">
+              Tindakan Cepat Pemantauan
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <Link 
+                to="/student-monitoring" 
+                className="p-5 bg-blue-50 dark:bg-blue-950/20 rounded-2xl border border-blue-100 dark:border-blue-900/30 flex flex-col justify-between hover:shadow-md transition-all group"
+              >
+                <div>
+                  <Users className="h-6 w-6 text-blue-600 mb-2 group-hover:scale-110 transition-transform" />
+                  <p className="text-[9px] font-black text-blue-500 uppercase tracking-widest">Student Progress</p>
+                  <p className="text-xs font-bold text-gray-800 dark:text-white mt-1 leading-tight">Pantau Capaian Level Mahasiswa</p>
+                </div>
+                <span className="text-[9px] font-black text-blue-700 bg-white border border-blue-100 px-3 py-1.5 rounded-lg uppercase tracking-wider mt-4 self-start">
+                  Buka Monitoring
+                </span>
+              </Link>
+
+              <Link 
+                to="/content-management?tab=assignments" 
+                className="p-5 bg-orange-50 dark:bg-orange-950/20 rounded-2xl border border-orange-100 dark:border-orange-900/30 flex flex-col justify-between hover:shadow-md transition-all group"
+              >
+                <div>
+                  <Star className="h-6 w-6 text-orange-600 mb-2 group-hover:scale-110 transition-transform" />
+                  <p className="text-[9px] font-black text-orange-500 uppercase tracking-widest">Grading Queue</p>
+                  <p className="text-xs font-bold text-gray-800 dark:text-white mt-1 leading-tight">Nilai Pengumpulan Tugas Video</p>
+                </div>
+                <span className="text-[9px] font-black text-orange-700 bg-white border border-orange-100 px-3 py-1.5 rounded-lg uppercase tracking-wider mt-4 self-start">
+                  {adminStats?.pending_assignments || 0} Antrean
+                </span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full flex flex-col gap-6 md:gap-8 pb-10 p-6 md:p-10 bg-white dark:bg-gray-950 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm min-h-screen transition-colors duration-300">
