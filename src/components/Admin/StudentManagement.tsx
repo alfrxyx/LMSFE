@@ -187,7 +187,6 @@ export function StudentManagement() {
  </div>
  )}
  </div>
- </div>
 
  {/* Student Detail Modal */}
  <StudentDetailModal 

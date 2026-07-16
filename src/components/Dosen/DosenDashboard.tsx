@@ -11,7 +11,9 @@ import {
   TrendingUp,
   BarChart3,
   FileText,
-  LayoutDashboard
+  LayoutDashboard,
+  PieChart as PieChartIcon,
+  Filter
 } from "lucide-react";
 import {
   BarChart,
@@ -23,7 +25,10 @@ import {
   ResponsiveContainer,
   AreaChart,
   Area,
-  Cell
+  Cell,
+  PieChart,
+  Pie,
+  Legend
 } from "recharts";
 import { useAuth } from "../../contexts/AuthContext";
 import { StudentMonitoring } from "./StudentMonitoring";
@@ -43,15 +48,28 @@ export function DosenDashboard({
   const [loading, setLoading] = useState(true);
   const [isMounted, setIsMounted] = useState(false);
 
+  const [semesterFilter, setSemesterFilter] = useState('all');
+  const [classrooms, setClassrooms] = useState<any[]>([]);
+  const [selectedClassroom, setSelectedClassroom] = useState('all');
+
   // TABS CONFIGURATION
   const dosenTabs = [
     { id: "overview", name: "Analytics", icon: Activity },
     { id: "submissions", name: "Penilaian", icon: FileText },
   ];
 
+  const fetchClassrooms = async () => {
+    try {
+      const res = await api.get('/admin/classrooms');
+      setClassrooms(res.data.data || []);
+    } catch (e) {
+      console.error("Gagal memuat kelas:", e);
+    }
+  };
+
   useEffect(() => {
     setIsMounted(true);
-    fetchDashboardData();
+    fetchClassrooms();
   }, []);
 
   useEffect(() => {
@@ -60,9 +78,8 @@ export function DosenDashboard({
 
   const fetchDashboardData = async () => {
     try {
-      setLoading(true);
       const [statsRes, subRes] = await Promise.all([
-        api.get("/admin/stats"),
+        api.get(`/admin/stats?classroom_id=${selectedClassroom}&semester=${semesterFilter}`),
         api.get("/dosen/assignments/youtube")
       ]);
       
@@ -74,6 +91,25 @@ export function DosenDashboard({
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (isMounted) {
+      fetchDashboardData();
+    }
+  }, [selectedClassroom, semesterFilter, isMounted]);
+
+  const filteredClassrooms = classrooms.filter(cls => 
+    semesterFilter === 'all' || cls.semester.toString() === semesterFilter
+  );
+
+  useEffect(() => {
+    if (selectedClassroom !== 'all') {
+      const isClassroomVisible = filteredClassrooms.some(cls => cls.id.toString() === selectedClassroom);
+      if (!isClassroomVisible) {
+        setSelectedClassroom('all');
+      }
+    }
+  }, [semesterFilter, classrooms]);
 
 return (
   <div className="w-full flex flex-col gap-10 p-6 md:p-10 bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm min-h-screen transition-colors duration-300">
@@ -111,6 +147,41 @@ return (
         </div>
       </div>
 
+      {/* Global Filter Bar */}
+      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between bg-gray-50 dark:bg-gray-800/40 p-4 rounded-[2rem] border border-gray-100 dark:border-gray-700/80 w-full shadow-inner shrink-0">
+        <div className="flex items-center gap-3">
+          <Filter className="h-4 w-4 text-blue-600" />
+          <span className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Filter Dashboard Global</span>
+        </div>
+        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+          {/* Classroom Dropdown */}
+          <select 
+            className="px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-xs font-bold dark:text-white focus:border-blue-500 outline-none shadow-sm cursor-pointer"
+            value={selectedClassroom}
+            onChange={(e) => setSelectedClassroom(e.target.value)}
+          >
+            <option value="all">SEMUA KELAS</option>
+            {filteredClassrooms.map((cls: any) => (
+              <option key={cls.id} value={cls.id.toString()}>
+                {cls.name} ({cls.course?.title || 'Mata Kuliah'})
+              </option>
+            ))}
+          </select>
+
+          {/* Semester Selector */}
+          <select 
+            className="px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl text-xs font-bold dark:text-white focus:border-blue-500 outline-none shadow-sm cursor-pointer"
+            value={semesterFilter}
+            onChange={(e) => setSemesterFilter(e.target.value)}
+          >
+            <option value="all">SEMUA SEMESTER</option>
+            {[1,2,3,4,5,6,7,8].map(sem => (
+              <option key={sem} value={sem}>SEMESTER {sem}</option>
+            ))}
+          </select>
+        </div>
+      </div>
+
       {loading ? (
         <div className="flex-1 flex flex-col items-center justify-center py-20">
           <div className="h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
@@ -119,7 +190,8 @@ return (
       ) : (
         <div className="flex-1 w-full">
           {activeTab === "overview" ? (
-            <div className="space-y-8 w-full">
+            <div className="space-y-8 w-full animate-in fade-in duration-500">
+
               {/* STATS GRID */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 uiverse-parent w-full">
                 <StatCard label="Total Mahasiswa" value={stats?.total_students} icon={Users} sublabel="DATABASE" />
@@ -149,27 +221,34 @@ return (
                   </div>
                 </div>
                 
-                <div className="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm min-h-[400px]">
-                  <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-widest mb-8 flex items-center gap-2">
-                     <Activity size={18} className="text-blue-600 dark:text-blue-400" /> Tren Performa Mahasiswa
+                <div className="bg-white dark:bg-gray-800 p-8 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm min-h-[400px] flex flex-col justify-between">
+                  <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-widest mb-8 flex items-center gap-2 shrink-0">
+                     <PieChartIcon size={18} className="text-blue-600 dark:text-blue-400" /> Rasio Kelengkapan Tugas Praktikum
                   </h3>
-                  <div className="h-64 w-full relative">
-                    {isMounted && (
+                  <div className="h-64 w-full relative flex-1">
+                    {isMounted && stats?.pedagogical_stats?.assignment_stats ? (
                       <ResponsiveContainer width="99%" height={256}>
-                        <AreaChart data={[
-                          { name: 'S1', avgXP: 450 },
-                          { name: 'S2', avgXP: 520 },
-                          { name: 'S3', avgXP: 480 },
-                          { name: 'S4', avgXP: 610 },
-                          { name: 'S5', avgXP: 590 },
-                          { name: 'S6', avgXP: 720 },
-                        ]}>
-                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                          <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: "#94a3b8", fontSize: 10, fontWeight: 700 }} />
-                          <Tooltip />
-                          <Area type="monotone" dataKey="avgXP" stroke="#3b82f6" strokeWidth={3} fill="#3b82f6" fillOpacity={0.05} />
-                        </AreaChart>
+                        <PieChart>
+                          <Pie
+                            data={stats.pedagogical_stats.assignment_stats}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={60}
+                            outerRadius={80}
+                            paddingAngle={5}
+                            dataKey="value"
+                          >
+                            {stats.pedagogical_stats.assignment_stats.map((entry: any, index: number) => {
+                              const COLORS = ['#10b981', '#f59e0b', '#ef4444'];
+                              return <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />;
+                            })}
+                          </Pie>
+                          <Tooltip formatter={(value) => `${value} Tugas`} />
+                          <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                        </PieChart>
                       </ResponsiveContainer>
+                    ) : (
+                      <div className="flex items-center justify-center h-full text-gray-400 font-bold text-xs uppercase">Tidak ada data tugas</div>
                     )}
                   </div>
                 </div>
@@ -187,7 +266,11 @@ return (
             </div>
           ) : (
             <div className="bg-white dark:bg-gray-800 rounded-[2.5rem] border border-gray-100 dark:border-gray-700 shadow-sm min-h-[60vh] animate-in fade-in duration-500 w-full transition-colors duration-300">
-              <SubmissionsPanel onGradeComplete={fetchDashboardData} />
+              <SubmissionsPanel 
+                onGradeComplete={fetchDashboardData} 
+                selectedClassroom={selectedClassroom}
+                semesterFilter={semesterFilter}
+              />
             </div>
           )}
         </div>
@@ -226,7 +309,7 @@ function StatCard({ label, value, icon: Icon, onClick, sublabel }: any) {
   );
 }
 
-function SubmissionsPanel({ onGradeComplete }: any) {
+function SubmissionsPanel({ onGradeComplete, selectedClassroom, semesterFilter }: any) {
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -237,12 +320,14 @@ function SubmissionsPanel({ onGradeComplete }: any) {
   const fetchSubmissions = async () => {
     try {
       setLoading(true);
-      const res = await api.get('/dosen/assignments/youtube');
+      const res = await api.get(`/dosen/assignments/youtube?classroom_id=${selectedClassroom}&semester=${semesterFilter}`);
       setSubmissions(res.data.data);
     } catch (e) { toast.error("Gagal memuat tugas"); } finally { setLoading(false); }
   };
 
-  useEffect(() => { fetchSubmissions(); }, []);
+  useEffect(() => { 
+    fetchSubmissions(); 
+  }, [selectedClassroom, semesterFilter]);
 
   if (loading) return <div className="py-20 text-center text-gray-400 dark:text-gray-500 font-bold uppercase text-[10px] tracking-[0.2em] animate-pulse">Memuat Antrean Penilaian...</div>;
 
@@ -261,15 +346,32 @@ function SubmissionsPanel({ onGradeComplete }: any) {
                 <p className="text-[10px] text-gray-400 dark:text-gray-500 font-bold uppercase tracking-widest mt-1">{sub.level?.title}</p>
               </div>
             </div>
-            <button 
-              onClick={() => {
-                setSelectedSubmission(sub);
-                setIsGradingModalOpen(true);
-              }}
-              className="px-8 py-3 bg-blue-600 text-white text-[10px] font-black rounded-2xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 dark:shadow-none uppercase tracking-widest active:scale-95"
-            >
-              NILAI SEKARANG
-            </button>
+            {sub.is_completed ? (
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] font-black text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-950/20 px-4 py-2 rounded-xl uppercase tracking-widest">
+                  Dinilai (+{sub.earned_points || 0} XP)
+                </span>
+                <button 
+                  onClick={() => {
+                    setSelectedSubmission(sub);
+                    setIsGradingModalOpen(true);
+                  }}
+                  className="px-6 py-2.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 text-[9px] font-black rounded-xl transition-all uppercase tracking-widest active:scale-95"
+                >
+                  Ubah Nilai
+                </button>
+              </div>
+            ) : (
+              <button 
+                onClick={() => {
+                  setSelectedSubmission(sub);
+                  setIsGradingModalOpen(true);
+                }}
+                className="px-8 py-3 bg-blue-600 text-white text-[10px] font-black rounded-2xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 dark:shadow-none uppercase tracking-widest active:scale-95 animate-pulse"
+              >
+                NILAI SEKARANG
+              </button>
+            )}
           </div>
         ))}
         {submissions.length === 0 && (
