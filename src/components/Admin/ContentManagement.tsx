@@ -26,6 +26,18 @@ import { useApp } from "../../contexts/AppContext";
 import { toast } from "sonner";
 import { ConfirmModal } from "../Shared/ConfirmModal";
 
+const formatToLocalDatetime = (utcString: string | null) => {
+  if (!utcString) return "";
+  try {
+    const date = new Date(utcString);
+    if (isNaN(date.getTime())) return "";
+    const pad = (num: number) => String(num).padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  } catch (e) {
+    return "";
+  }
+};
+
 function ClassroomManager() {
   const { courses } = useApp();
   const [classrooms, setClassrooms] = useState<any[]>([]);
@@ -300,6 +312,8 @@ export function ContentManagement() {
     youtube_id: "",
     order: 1,
     deadline: "",
+    open_at: "",
+    duration_minutes: "",
     sendAnnouncement: true, // Default true untuk materi baru
   });
 
@@ -570,6 +584,8 @@ export function ContentManagement() {
       youtube_id: "",
       order: nextOrder,
       deadline: "",
+      open_at: "",
+      duration_minutes: "",
       sendAnnouncement: true,
     });
     setRubricCriteria([]);
@@ -1493,6 +1509,48 @@ export function ContentManagement() {
                       <p className="text-[9px] text-gray-400 dark:text-gray-500 mt-2 italic ml-1">Sistem akan mengirim email pengingat otomatis pada H-1 deadline.</p>
                     </div>
 
+                    {/* INPUT OPEN_AT */}
+                    <div>
+                      <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 block">
+                        Jadwal Buka (Akses Dimulai)
+                      </label>
+                      <input
+                        type="datetime-local"
+                        className="w-full p-4 bg-gray-50 dark:bg-gray-900 rounded-2xl border-2 border-transparent focus:border-blue-500 focus:bg-white dark:focus:bg-gray-900 transition-all font-bold outline-none text-gray-900 dark:text-white"
+                        value={levelForm.open_at}
+                        onChange={(e) =>
+                          setLevelForm({
+                            ...levelForm,
+                            open_at: e.target.value,
+                          })
+                        }
+                      />
+                      <p className="text-[9px] text-gray-400 dark:text-gray-500 mt-2 italic ml-1">Materi/Kuis tidak dapat dibuka oleh mahasiswa sebelum waktu yang dijadwalkan.</p>
+                    </div>
+
+                    {/* INPUT DURATION (ONLY FOR QUIZ) */}
+                    {levelForm.activity_type === "quiz" && (
+                      <div>
+                        <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 block">
+                          Durasi Kuis (Menit)
+                        </label>
+                        <input
+                          type="number"
+                          placeholder="Contoh: 15 (kosongkan jika tidak dibatasi)"
+                          className="w-full p-4 bg-gray-50 dark:bg-gray-900 rounded-2xl border-2 border-transparent focus:border-blue-500 focus:bg-white dark:focus:bg-gray-900 transition-all font-bold outline-none text-gray-900 dark:text-white"
+                          value={levelForm.duration_minutes}
+                          onChange={(e) =>
+                            setLevelForm({
+                              ...levelForm,
+                              duration_minutes: e.target.value,
+                            })
+                          }
+                          min={1}
+                        />
+                        <p className="text-[9px] text-gray-400 dark:text-gray-500 mt-2 italic ml-1">Mahasiswa harus menyelesaikan kuis dalam durasi waktu ini setelah dimulai.</p>
+                      </div>
+                    )}
+
                     {/* INPUT PDF MODUL (OPSIONAL) */}
                     <div>
                       <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-2 block">
@@ -1764,7 +1822,9 @@ export function ContentManagement() {
                                 activity_type: lvl.activity_type,
                                 youtube_id: lvl.youtube_id || "",
                                 order: lvl.order,
-                                deadline: lvl.deadline ? lvl.deadline.substring(0, 16) : "",
+                                deadline: formatToLocalDatetime(lvl.deadline),
+                                open_at: formatToLocalDatetime(lvl.open_at),
+                                duration_minutes: lvl.duration_minutes || "",
                                 sendAnnouncement: false, // Default false saat edit agar tidak spam
                               });
                               setRubricCriteria(lvl.rubric || []);

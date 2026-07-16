@@ -269,15 +269,16 @@ export function CourseDetail() {
 
  // Modal Evaluation Detail
  const [showEvalDetail, setShowEvalDetail] = useState(false);
-
- // --- LEVEL UP STATE ---
+// --- LEVEL UP STATE ---
  const [showLevelUp, setShowLevelUp] = useState(false);
  const [newLevel, setNewLevel] = useState(1);
 
- // --- QUIZ STATES ---
- const [quizAnswers, setQuizAnswers] = useState<Record<number, number>>({});
- const [quizSubmitted, setQuizSubmitted] = useState(false);
- const [quizScore, setQuizScore] = useState(0);
+  // --- QUIZ STATES ---
+  const [quizAnswers, setQuizAnswers] = useState<Record<number, number>>({});
+  const [quizSubmitted, setQuizSubmitted] = useState(false);
+  const [quizScore, setQuizScore] = useState(0);
+  const [isQuizStarted, setIsQuizStarted] = useState(false);
+  const [timeLeft, setTimeLeft] = useState<number | null>(null);
 
  const fetchCourseDetail = async (isInitialLoad: boolean = false) => {
  try {
@@ -348,6 +349,8 @@ export function CourseDetail() {
    setQuizAnswers({});
    setQuizSubmitted(false);
    setQuizScore(0);
+   setIsQuizStarted(false);
+   setTimeLeft(null);
  };
 
  const isPreviousLevelCompleted = () => {
@@ -367,19 +370,59 @@ export function CourseDetail() {
    // Cek level sebelumnya di array yang sudah terurut
    const prevLevel = levels[currentIndex - 1];
    return prevLevel ? prevLevel.is_completed : true;
- };
+  };
+ 
+  // --- TIMER EFFECT UNTUK KUIS ---
+  useEffect(() => {
+    if (!isQuizStarted || timeLeft === null) return;
 
- const handleQuizSubmit = async () => {
-  if (!activeLevel.questions || activeLevel.questions.length === 0) return;
-  if (!isPreviousLevelCompleted()) {
-    toast.error(`Selesaikan ${course.levels.find((l: any) => l.order === activeLevel.order - 1)?.title} terlebih dahulu!`);
-    return;
-  }
-   setSubmitting(true);
-   try {
-     const response = await api.post(`/levels/${activeLevel.id}/complete`, {
-       answers: quizAnswers
-     });
+    if (timeLeft <= 0) {
+      toast.warning("Waktu pengerjaan kuis telah habis! Mengirimkan jawaban...");
+      handleQuizSubmit();
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft(prev => (prev !== null ? prev - 1 : null));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [isQuizStarted, timeLeft, quizAnswers]);
+
+  const handleStartQuiz = async () => {
+    try {
+      const response = await api.post(`/levels/${activeLevel.id}/start-quiz`);
+      const { remaining_seconds } = response.data;
+      
+      setIsQuizStarted(true);
+      setQuizAnswers({});
+      setQuizSubmitted(false);
+      setQuizScore(0);
+      
+      if (remaining_seconds !== null) {
+        setTimeLeft(remaining_seconds);
+      } else {
+        setTimeLeft(null);
+      }
+      toast.success("Kuis dimulai! Semoga sukses.");
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Gagal memulai kuis");
+    }
+  };
+
+  const handleQuizSubmit = async () => {
+   if (!activeLevel.questions || activeLevel.questions.length === 0) return;
+   if (!isPreviousLevelCompleted()) {
+     toast.error(`Selesaikan ${course.levels.find((l: any) => l.order === activeLevel.order - 1)?.title} terlebih dahulu!`);
+     return;
+   }
+    setSubmitting(true);
+    setIsQuizStarted(false);
+    setTimeLeft(null);
+    try {
+      const response = await api.post(`/levels/${activeLevel.id}/complete`, {
+        answers: quizAnswers
+      });
 
      if (response.data.success === false) {
        setQuizScore(response.data.score);
@@ -718,36 +761,125 @@ export function CourseDetail() {
  </div>
 
  {activeLevel.is_completed ? (
- <div className="bg-green-50/50 dark:bg-green-900/10 p-12 rounded-[3rem] border border-green-100 dark:border-green-900/30 text-center space-y-8">
- <div className="h-24 w-24 bg-white dark:bg-gray-800 text-green-600 dark:text-green-400 rounded-[2rem] flex items-center justify-center mx-auto shadow-xl shadow-green-100/50 dark:shadow-none border border-green-100 dark:border-green-800">
- <CheckCircle size={48} />
- </div>
- <div>
- <h4 className="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Materi Selesai!</h4>
- <p className="text-gray-500 dark:text-gray-400 font-medium text-lg mt-2">Anda telah berhasil menguasai kuis ini.</p>
- </div>
- <div className="flex flex-col sm:flex-row gap-4 justify-center">
-    <button 
-      onClick={() => setShowEvalDetail(true)}
-      className="inline-flex items-center justify-center gap-3 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 border-2 border-blue-600 dark:border-blue-500 px-10 py-5 rounded-[2.5rem] font-black text-xs uppercase tracking-widest hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-all active:scale-95"
-    >
-      <BarChart3 size={18} /> LIHAT EVALUASI
-    </button>
-    {course?.levels?.find((l: any) => l.order === activeLevel.order + 1) && (
-      <button 
-        onClick={() => {
-          const nextLvl = course.levels.find((l: any) => l.order === activeLevel.order + 1);
-          if (nextLvl) handleSelectLevel(nextLvl);
-        }}
-        className="inline-flex items-center justify-center gap-4 bg-gray-900 dark:bg-gray-800 text-white px-12 py-5 rounded-[2.5rem] font-black text-xs uppercase tracking-widest shadow-2xl hover:bg-blue-600 transition-all active:scale-95"
-      >
-        Pertemuan Selanjutnya <ArrowLeft size={18} className="rotate-180" />
-      </button>
-    )}
- </div>
- </div>
- ) : !quizSubmitted ? (
- <div className="space-y-12">
+    (() => {
+      const displayScore = (() => {
+        if (quizSubmitted) return quizScore;
+        if (!activeLevel.assignment_link) return null;
+        const match = activeLevel.assignment_link.match(/Quiz Score: (\d+)%/);
+        return match ? Number(match[1]) : null;
+      })();
+
+      const isPassed = displayScore === null || displayScore >= 70;
+
+      return (
+        <div className={`p-12 rounded-[3rem] border text-center space-y-8 ${
+          isPassed 
+            ? 'bg-green-50/50 dark:bg-green-900/10 border-green-100 dark:border-green-900/30' 
+            : 'bg-yellow-50/50 dark:bg-yellow-950/10 border-yellow-100 dark:border-yellow-900/30'
+        }`}>
+          <div className={`h-24 w-24 bg-white dark:bg-gray-800 rounded-[2rem] flex items-center justify-center mx-auto shadow-xl shadow-gray-100/50 dark:shadow-none border border-gray-100 dark:border-gray-800 ${
+            isPassed ? 'text-green-600 dark:text-green-400' : 'text-yellow-600 dark:text-yellow-400'
+          }`}>
+            {isPassed ? <CheckCircle size={48} /> : <AlertCircle size={48} />}
+          </div>
+          <div>
+            <h4 className="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tight">
+              {isPassed ? 'Materi Selesai!' : 'Kuis Selesai'}
+            </h4>
+            <p className="text-gray-500 dark:text-gray-400 font-bold text-lg mt-2">
+              {displayScore !== null 
+                ? `Skor Anda: ${displayScore}/100. ${isPassed ? 'Hasil yang luar biasa!' : 'Kuis ini telah selesai dikerjakan.'}`
+                : 'Anda telah menyelesaikan kuis ini.'}
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button 
+              onClick={() => setShowEvalDetail(true)}
+              className="inline-flex items-center justify-center gap-3 bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 border-2 border-blue-600 dark:border-blue-500 px-10 py-5 rounded-[2.5rem] font-black text-xs uppercase tracking-widest hover:bg-blue-50 dark:hover:bg-blue-900/30 transition-all active:scale-95"
+            >
+              <BarChart3 size={18} /> LIHAT EVALUASI
+            </button>
+            {course?.levels?.find((l: any) => l.order === activeLevel.order + 1) && (
+              <button 
+                onClick={() => {
+                  const nextLvl = course.levels.find((l: any) => l.order === activeLevel.order + 1);
+                  if (nextLvl) handleSelectLevel(nextLvl);
+                }}
+                className="inline-flex items-center justify-center gap-4 bg-gray-900 dark:bg-gray-800 text-white px-12 py-5 rounded-[2.5rem] font-black text-xs uppercase tracking-widest shadow-2xl hover:bg-blue-600 transition-all active:scale-95"
+              >
+                Pertemuan Selanjutnya <ArrowLeft size={18} className="rotate-180" />
+              </button>
+            )}
+          </div>
+        </div>
+      );
+    })()
+  ) : !isQuizStarted && !quizSubmitted ? (
+    <div className="bg-blue-50/10 dark:bg-gray-800/40 p-10 md:p-12 rounded-[2.5rem] border border-blue-100/50 dark:border-gray-700/50 text-center space-y-8 max-w-2xl mx-auto animate-in fade-in duration-300">
+      <div className="h-20 w-20 bg-blue-600 text-white rounded-[1.75rem] flex items-center justify-center mx-auto shadow-xl shadow-blue-500/25 dark:shadow-none">
+        <Play size={36} className="ml-1" />
+      </div>
+      <div className="space-y-3">
+        <h4 className="text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Kuis Pemahaman Siap!</h4>
+        <p className="text-xs text-gray-400 dark:text-gray-500 font-black uppercase tracking-wider">
+          Silakan Mulai untuk Menguji Pemahaman Anda
+        </p>
+      </div>
+      <div className="grid grid-cols-2 gap-4 max-w-md mx-auto text-left">
+        <div className="bg-white dark:bg-gray-900 p-5 rounded-2xl border border-gray-100 dark:border-gray-800/60 shadow-sm">
+          <p className="text-[10px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest">Pertanyaan</p>
+          <p className="text-lg font-black text-gray-900 dark:text-white mt-1">{activeLevel.questions?.length || 0} Soal</p>
+        </div>
+        <div className="bg-white dark:bg-gray-900 p-5 rounded-2xl border border-gray-100 dark:border-gray-800/60 shadow-sm">
+          <p className="text-[10px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest">Waktu Pengerjaan</p>
+          <p className="text-lg font-black text-gray-900 dark:text-white mt-1">
+            {activeLevel.duration_minutes ? `${activeLevel.duration_minutes} Menit` : "Tidak Dibatasi"}
+          </p>
+        </div>
+        {activeLevel.open_at && (
+          <div className="col-span-2 bg-white dark:bg-gray-900 p-5 rounded-2xl border border-gray-100 dark:border-gray-800/60 shadow-sm">
+            <p className="text-[10px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest">Jadwal Dibuka</p>
+            <p className="text-xs font-black text-gray-900 dark:text-white mt-1">
+              {new Date(activeLevel.open_at).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' })} WIB
+            </p>
+          </div>
+        )}
+        {activeLevel.deadline && (
+          <div className="col-span-2 bg-white dark:bg-gray-900 p-5 rounded-2xl border border-gray-100 dark:border-gray-800/60 shadow-sm">
+            <p className="text-[10px] text-gray-400 dark:text-gray-500 font-black uppercase tracking-widest">Batas Pengumpulan (Deadline)</p>
+            <p className="text-xs font-black text-red-600 dark:text-red-400 mt-1">
+              {new Date(activeLevel.deadline).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' })} WIB
+            </p>
+          </div>
+        )}
+      </div>
+      <div className="pt-2">
+        <button
+          onClick={handleStartQuiz}
+          disabled={!isPreviousLevelCompleted() || (activeLevel.pdf_path && !pdfOpened)}
+          className="inline-flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 dark:disabled:bg-gray-850 disabled:text-gray-400 text-white px-12 py-5 rounded-[2.5rem] font-black text-xs uppercase tracking-[0.2em] shadow-xl hover:shadow-blue-500/25 transition-all active:scale-95"
+        >
+          <Play size={16} /> MULAI KERJAKAN KUIS
+        </button>
+        {activeLevel.pdf_path && !pdfOpened && (
+          <p className="text-[9px] text-red-500 font-bold uppercase tracking-widest mt-4">Silakan baca Modul PDF di atas terlebih dahulu!</p>
+        )}
+      </div>
+    </div>
+  ) : !quizSubmitted ? (
+    <div className="space-y-12">
+      {/* Timer Countdown Header */}
+      {timeLeft !== null && (
+        <div className="flex items-center justify-between bg-yellow-50/50 dark:bg-yellow-950/20 p-5 rounded-2xl border border-yellow-100/50 dark:border-yellow-900/30 sticky top-0 z-10 backdrop-blur-md shadow-sm">
+          <div className="flex items-center gap-3">
+            <Clock className={`h-5 w-5 ${timeLeft <= 60 ? 'text-red-500 animate-pulse' : 'text-yellow-600'}`} />
+            <span className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-wider">Sisa Waktu Pengerjaan:</span>
+          </div>
+          <span className={`text-xl font-black ${timeLeft <= 60 ? 'text-red-600 dark:text-red-400 animate-pulse' : 'text-gray-900 dark:text-white'}`}>
+            {Math.floor(timeLeft / 60)}:{Math.floor(timeLeft % 60).toString().padStart(2, '0')}
+          </span>
+        </div>
+      )}
  {activeLevel.questions?.map((q: any, idx: number) => (
  <div key={q.id} className="space-y-6">
  <p className="text-xl font-black text-gray-900 dark:text-white leading-snug">
@@ -779,22 +911,19 @@ export function CourseDetail() {
  </button>
  </div>
  ) : (
- <div className="text-center py-16 space-y-10">
- <div className={`h-40 w-40 mx-auto rounded-[3rem] flex items-center justify-center text-5xl font-black shadow-2xl border-8 border-white dark:border-gray-800 ${quizScore >= 70 ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 shadow-green-100 dark:shadow-none' : 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 shadow-red-100 dark:shadow-none'}`}>
- {quizScore}
- </div>
- <div className="space-y-2">
- <h4 className="text-3xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">{quizScore >= 70 ? 'SKOR FANTASTIS!' : 'COBA LAGI, SEMANGAT!'}</h4>
- <p className="text-gray-500 dark:text-gray-400 font-bold text-lg">
- {quizScore >= 70 
- ? 'Selamat! Anda telah menguasai materi ini dengan baik.' 
- : 'Skor kelulusan minimal adalah 70. Silakan pelajari kembali materinya.'}
- </p>
- </div>
- {quizScore < 70 && (
- <button onClick={() => { setQuizSubmitted(false); setQuizAnswers({}); }} className="bg-gray-900 dark:bg-gray-800 text-white px-10 py-4 rounded-2xl font-black uppercase text-[10px] tracking-[0.2em] hover:bg-blue-600 transition-all">ULANGI KUIS</button>
- )}
- </div>
+  <div className="text-center py-16 space-y-10">
+  <div className={`h-40 w-40 mx-auto rounded-[3rem] flex items-center justify-center text-5xl font-black shadow-2xl border-8 border-white dark:border-gray-800 ${quizScore >= 70 ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 shadow-green-100 dark:shadow-none' : 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 shadow-yellow-100 dark:shadow-none'}`}>
+  {quizScore}
+  </div>
+  <div className="space-y-2">
+  <h4 className="text-3xl font-black text-gray-900 dark:text-white uppercase tracking-tighter">{quizScore >= 70 ? 'SKOR FANTASTIS!' : 'KUIS SELESAI'}</h4>
+  <p className="text-gray-500 dark:text-gray-400 font-bold text-lg">
+  {quizScore >= 70 
+  ? 'Selamat! Anda telah menguasai materi ini dengan baik.' 
+  : 'Skor Anda telah tercatat. Kuis selesai dikerjakan.'}
+  </p>
+  </div>
+  </div>
  )}
  </div>
  ) : activeLevel.activity_type === 'assignment' ? (
