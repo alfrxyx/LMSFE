@@ -12,6 +12,8 @@ export function StudentBySemester() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [semesterFilter, setSemesterFilter] = useState('all');
+  const [classrooms, setClassrooms] = useState<any[]>([]);
+  const [selectedClassroom, setSelectedClassroom] = useState('all');
 
   // State for Detail Modal
   const [selectedStudent, setSelectedStudent] = useState<any | null>(null);
@@ -29,13 +31,37 @@ export function StudentBySemester() {
     }
   };
 
+  const fetchClassrooms = async () => {
+    try {
+      const res = await api.get('/admin/classrooms');
+      setClassrooms(res.data.data || []);
+    } catch (e) {
+      console.error("Gagal memuat kelas:", e);
+    }
+  };
+
   useEffect(() => {
     fetchStudents();
+    fetchClassrooms();
   }, []);
+
+  const filteredClassrooms = classrooms.filter(cls => 
+    semesterFilter === 'all' || cls.semester.toString() === semesterFilter
+  );
+
+  useEffect(() => {
+    if (selectedClassroom !== 'all') {
+      const isClassroomVisible = filteredClassrooms.some(cls => cls.id.toString() === selectedClassroom);
+      if (!isClassroomVisible) {
+        setSelectedClassroom('all');
+      }
+    }
+  }, [semesterFilter, classrooms]);
 
   const filteredStudents = students
     .filter(s => 
       (semesterFilter === 'all' || s.semester.toString() === semesterFilter) &&
+      (selectedClassroom === 'all' || (s.classrooms && s.classrooms.some((cls: any) => cls.id.toString() === selectedClassroom))) &&
       (s.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
        s.nim.toLowerCase().includes(searchTerm.toLowerCase()))
     )
@@ -79,7 +105,20 @@ export function StudentBySemester() {
             />
           </div>
           <select 
-            className="px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl text-xs font-bold dark:text-white focus:border-blue-500 outline-none shadow-sm"
+            className="px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl text-xs font-bold dark:text-white focus:border-blue-500 outline-none shadow-sm cursor-pointer"
+            value={selectedClassroom}
+            onChange={(e) => setSelectedClassroom(e.target.value)}
+          >
+            <option value="all">SEMUA KELAS</option>
+            {filteredClassrooms.map((cls: any) => (
+              <option key={cls.id} value={cls.id.toString()}>
+                {cls.name} ({cls.course?.title || 'Mata Kuliah'})
+              </option>
+            ))}
+          </select>
+
+          <select 
+            className="px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl text-xs font-bold dark:text-white focus:border-blue-500 outline-none shadow-sm cursor-pointer"
             value={semesterFilter}
             onChange={(e) => setSemesterFilter(e.target.value)}
           >

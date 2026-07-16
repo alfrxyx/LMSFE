@@ -33,7 +33,7 @@ export function ProgressOverview({ userData }: { userData: any }) {
     : [];
 
   return (
-    <div className="space-y-10">
+    <div className="max-h-[550px] overflow-y-auto pr-2 custom-scrollbar space-y-10">
       {courses.map((course: any) => {
         const levels = Array.isArray(course.levels) ? course.levels : [];
         

@@ -29,6 +29,33 @@ export function StudentDetailModal({ student, isOpen, onClose, onUpdate }: Stude
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
+  const parseRubric = (feedbackStr: string) => {
+    let cleanFeedback = feedbackStr || '';
+    let rubric: { preparation: number; execution: number; follow_through: number } | null = null;
+
+    if (feedbackStr && feedbackStr.includes('RUBRIC_DATA:')) {
+      try {
+        const parts = feedbackStr.split('|FEEDBACK:');
+        const jsonStr = parts[0].replace('RUBRIC_DATA:', '');
+        rubric = JSON.parse(jsonStr);
+        cleanFeedback = parts[1] || '';
+      } catch (e) {
+        console.error(e);
+      }
+    } else {
+      const rubricMatch = feedbackStr?.match(/\[RUBRIK\] Prep: (\d)\/5, Exec: (\d)\/5, Follow: (\d)\/5/);
+      if (rubricMatch) {
+        rubric = {
+          preparation: parseInt(rubricMatch[1]),
+          execution: parseInt(rubricMatch[2]),
+          follow_through: parseInt(rubricMatch[3])
+        };
+        cleanFeedback = feedbackStr?.replace(/\[RUBRIK\].*?\./, '').trim();
+      }
+    }
+    return { cleanFeedback, rubric };
+  };
+
   useEffect(() => {
     if (student) {
       setEditForm({
@@ -298,6 +325,34 @@ export function StudentDetailModal({ student, isOpen, onClose, onUpdate }: Stude
                   </div>
                 </div>
               </div>
+
+              {/* Kelas Praktikum yang Diikuti Card */}
+              <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm space-y-6">
+                <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.25em]">Kelas Praktikum yang Diikuti</h3>
+                <div className="space-y-4">
+                  {student.classrooms?.map((cls: any) => (
+                    <div key={cls.id} className="flex items-center justify-between p-5 bg-blue-50/50 rounded-2xl border border-blue-100 group transition-all">
+                      <div className="min-w-0">
+                        <p className="text-xs font-black text-gray-900 truncate uppercase tracking-tight">{cls.course?.title || 'Mata Kuliah'}</p>
+                        <div className="flex items-center gap-2 mt-1 text-[9px] font-extrabold text-gray-500 uppercase tracking-wider">
+                          <span>Kelas {cls.name}</span>
+                          <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
+                          <span>Semester {cls.semester}</span>
+                        </div>
+                      </div>
+                      <span className="text-[9px] font-black text-blue-700 bg-white border border-blue-100 px-3 py-1.5 rounded-lg uppercase tracking-wider">
+                        {cls.code}
+                      </span>
+                    </div>
+                  ))}
+                  {(!student.classrooms || student.classrooms.length === 0) && (
+                    <div className="text-center py-10 bg-gray-50 rounded-3xl border border-dashed border-gray-200">
+                      <AlertCircle className="h-8 w-8 text-blue-200 mx-auto mb-2" />
+                      <p className="text-[10px] font-black text-blue-300 uppercase tracking-widest">Belum Terdaftar di Kelas Mana Pun</p>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           )}
 
@@ -323,11 +378,108 @@ export function StudentDetailModal({ student, isOpen, onClose, onUpdate }: Stude
                 </div>
               </div>
 
-              <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm">
-                <h3 className="text-[10px] font-black text-gray-400 uppercase tracking-[0.25em] mb-8">Status Penilaian Terbaru</h3>
-                <div className="text-center py-20 bg-gray-50 rounded-[2.5rem] border border-dashed border-gray-200">
-                   <Clock className="h-12 w-12 text-gray-200 mx-auto mb-4" />
-                   <p className="text-xs font-black text-gray-400 uppercase tracking-widest">Detail histori nilai segera hadir</p>
+              {/* HISTORI PENILAIAN ASLI */}
+              <div className="bg-white dark:bg-gray-900 p-8 rounded-[2rem] border border-gray-100 dark:border-gray-800 shadow-sm space-y-6">
+                <h3 className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.25em] mb-4">Histori Penilaian & Tugas</h3>
+                
+                <div className="space-y-4">
+                  {(() => {
+                    const progressItems = Array.isArray(student.progress) ? student.progress : [];
+                    const assignmentSubmissions = progressItems.filter((p: any) => p.level?.activity_type === 'assignment' || p.assignment_link);
+
+                    if (assignmentSubmissions.length === 0) {
+                      return (
+                        <div className="text-center py-16 bg-gray-50 dark:bg-gray-900 rounded-[2rem] border border-dashed border-gray-100 dark:border-gray-800">
+                          <Clock className="h-10 w-10 text-gray-300 dark:text-gray-700 mx-auto mb-3" />
+                          <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">
+                            Belum ada tugas praktikum yang dikumpulkan mahasiswa.
+                          </p>
+                        </div>
+                      );
+                    }
+
+                    return assignmentSubmissions.map((sub: any) => {
+                      const { cleanFeedback, rubric } = parseRubric(sub.feedback);
+                      return (
+                        <div key={sub.id} className="p-6 bg-gray-50 dark:bg-gray-800/40 rounded-2xl border border-gray-100 dark:border-gray-800 space-y-4">
+                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                            <div>
+                              <h4 className="text-xs font-black text-gray-900 dark:text-white uppercase tracking-tight">
+                                {sub.level?.title || 'Tugas Praktikum'}
+                              </h4>
+                              <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mt-0.5">
+                                {sub.level?.course?.title || 'Mata Kuliah'}
+                              </p>
+                            </div>
+                            <span className={`text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-wider ${
+                              sub.is_completed 
+                                ? 'bg-green-100 text-green-700 dark:bg-green-950/20 dark:text-green-400' 
+                                : 'bg-orange-100 text-orange-700 dark:bg-orange-950/20 dark:text-orange-400'
+                            }`}>
+                              {sub.is_completed ? 'Tuntas & Dinilai' : 'Menunggu Penilaian'}
+                            </span>
+                          </div>
+
+                          {/* Link Tugas atau Skor Kuis */}
+                          {sub.assignment_link && (
+                            <div className="flex items-center gap-2 text-[10px] font-bold text-gray-400">
+                              {sub.level?.activity_type === 'quiz' || sub.assignment_link.startsWith('Quiz Score') ? (
+                                <>
+                                  <span>Hasil Skor Kuis:</span>
+                                  <span className="font-black text-gray-800 dark:text-gray-200 bg-white dark:bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-100 dark:border-gray-700 shadow-sm">
+                                    {sub.assignment_link}
+                                  </span>
+                                </>
+                              ) : (
+                                <>
+                                  <span>Link Pengumpulan:</span>
+                                  <a 
+                                    href={sub.assignment_link} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                    className="hover:underline text-blue-600 flex items-center gap-1 bg-white dark:bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-100 dark:border-gray-700 shadow-sm"
+                                  >
+                                    Buka Tautan Tugas <ExternalLink size={10} />
+                                  </a>
+                                </>
+                              )}
+                            </div>
+                          )}
+
+                          {/* Rubrik Penilaian */}
+                          {rubric && (
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
+                              {[
+                                { label: 'Awalan', score: rubric.preparation },
+                                { label: 'Pelaksanaan', score: rubric.execution },
+                                { label: 'Akhiran', score: rubric.follow_through }
+                              ].map((item, idx) => (
+                                <div key={idx} className="text-center sm:text-left">
+                                  <p className="text-[8px] font-black text-gray-400 uppercase tracking-wider">{item.label}</p>
+                                  <div className="flex items-center justify-center sm:justify-start gap-0.5 mt-1">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                      <Star 
+                                        key={star} 
+                                        size={12} 
+                                        className={star <= item.score ? "text-yellow-500 fill-yellow-400" : "text-gray-200 dark:text-gray-750"} 
+                                      />
+                                    ))}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          {/* Feedback Catatan */}
+                          {cleanFeedback && (
+                            <div className="text-xs text-gray-600 dark:text-gray-400 italic bg-white dark:bg-gray-800/40 p-4 rounded-xl border border-gray-100 dark:border-gray-800/80 leading-relaxed">
+                              "{cleanFeedback}"
+                            </div>
+                          )}
+                        </div>
+                      );
+                    });
+                  })()}
                 </div>
               </div>
             </div>

@@ -16,6 +16,7 @@ const CourseDetail = lazy(() => import('./components/Courses/CourseDetail').then
 const Leaderboard = lazy(() => import('./components/Leaderboard/Leaderboard').then(module => ({ default: module.Leaderboard })));
 const Achievements = lazy(() => import('./components/Dashboard/Achievements').then(module => ({ default: module.Achievements })));
 const Profile = lazy(() => import('./components/Dashboard/Profile').then(module => ({ default: module.Profile })));
+const Notifications = lazy(() => import('./components/Notifications/Notifications').then(module => ({ default: module.Notifications })));
 
 // Admin Lazy Load
 const AdminDashboard = lazy(() => import('./components/Admin/AdminDashboard').then(module => ({ default: module.AdminDashboard })));
@@ -134,6 +135,10 @@ const router = createBrowserRouter([
  {
  path: "/profile",
  element: <ProtectedRoute><Layout><Profile /></Layout></ProtectedRoute>,
+ },
+ {
+ path: "/notifications",
+ element: <ProtectedRoute><Layout><Notifications /></Layout></ProtectedRoute>,
  },
  {
  path: "/dosen/dashboard",

@@ -3,9 +3,10 @@ import api from '../../api/axios';
 import { 
   Users, Search, Loader2, 
   Calendar, Award, Flame, Badge as BadgeIcon,
-  ChevronRight, CheckCircle2, Clock, BookOpen, ChevronDown, GraduationCap
+  ChevronRight, CheckCircle2, Clock, BookOpen, ChevronDown, GraduationCap, Download
 } from 'lucide-react';
 import { useApp } from '../../contexts/AppContext';
+import { toast } from 'sonner';
 
 export function StudentMonitoring() {
   const [students, setStudents] = useState<any[]>([]);
@@ -73,6 +74,43 @@ export function StudentMonitoring() {
     return matchesSearch && matchesSemester;
   });
 
+  const handleExportCSV = () => {
+    if (filteredStudents.length === 0) {
+      toast.error("Tidak ada data untuk diekspor");
+      return;
+    }
+
+    const headers = ["NIM", "Nama Mahasiswa", "Semester Akademik", "Poin (XP)", "Level", "Progres Belajar (%)", "Jumlah Pertemuan Selesai", "Streak Login"];
+    const rows = filteredStudents.map(student => [
+      `"${student.nim}"`,
+      `"${student.name}"`,
+      student.semester,
+      student.points,
+      student.level,
+      `"${student.progress_percentage}%"`,
+      student.completed_count,
+      student.current_streak
+    ]);
+
+    const csvContent = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+
+    const classroomName = selectedClassroom === 'all' 
+      ? 'Semua_Kelas' 
+      : (classrooms.find(c => c.id.toString() === selectedClassroom)?.name || 'Kelas');
+    const fileName = `Rekap_Progres_Mahasiswa_${classroomName.replace(/\s+/g, '_')}_S${semesterFilter}.csv`;
+    
+    link.setAttribute("download", fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.success("File rekap CSV berhasil diunduh!");
+  };
+
   if (loading) return (
     <div className="py-20 text-center flex flex-col items-center gap-4">
       <div className="h-8 w-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
@@ -81,7 +119,24 @@ export function StudentMonitoring() {
   );
 
   return (
-    <div className="space-y-6 p-6 md:p-10 bg-white rounded-xl border border-gray-100 shadow-sm">
+    <div className="space-y-6 p-6 md:p-10 bg-white dark:bg-gray-950 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm transition-colors duration-300">
+      
+      {/* Header Area */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-100 dark:border-gray-800 pb-6">
+        <div>
+          <h2 className="text-xl md:text-2xl font-black text-gray-900 dark:text-white uppercase tracking-tight flex items-center gap-3">
+            <Users className="text-blue-600" /> Pemantauan Mahasiswa
+          </h2>
+          <p className="text-xs text-gray-400 font-bold uppercase mt-1">Pantau progres belajar, keaktifan, dan unduh laporan akademik kelas Anda</p>
+        </div>
+        <button
+          onClick={handleExportCSV}
+          className="self-start sm:self-center inline-flex items-center gap-2 px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-md shadow-blue-100 dark:shadow-none active:scale-95"
+        >
+          <Download size={14} /> Ekspor Rekap CSV
+        </button>
+      </div>
+
       {/* Filters Area */}
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-gray-50 p-4 rounded-[2rem] border border-gray-100 shadow-inner w-full">
         {/* Search */}
