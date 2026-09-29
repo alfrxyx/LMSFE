@@ -7,40 +7,40 @@ import { AchievementOverlay } from '../Gamification/AchievementOverlay';
 import { XPAnimator } from '../Gamification/XPAnimator';
 
 interface LayoutProps {
- children: React.ReactNode;
+  children: React.ReactNode;
 }
 
 export function Layout({ children }: LayoutProps) {
- const { user } = useAuth();
- const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const { user } = useAuth();
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
- return (
- <div className="min-h-screen bg-[#F8F9FB] dark:bg-gray-950 flex transition-colors duration-300">
- {/* Achievement & XP Popups Global */}
- <AchievementOverlay />
- <XPAnimator />
+  return (
+    <div className="min-h-screen bg-[#F8F9FB] dark:bg-gray-950 flex transition-colors duration-300">
+      {/* Achievement & XP Popups Global */}
+      <AchievementOverlay />
+      <XPAnimator />
 
- {/* Desktop Sidebar */}
- {user && <Sidebar />}
+      {/* Desktop Sidebar */}
+      {user && <Sidebar />}
 
- {/* Mobile Sidebar (Drawer) */}
- {user && (
-   <MobileSidebar 
-     isOpen={isMobileSidebarOpen} 
-     onClose={() => setIsMobileSidebarOpen(false)} 
-   />
- )}
- 
- <div className={`flex-1 flex flex-col min-w-0 ${user ? 'lg:pl-64' : ''}`}>
- {/* Header tetap di atas - Ditambah prop onMenuClick */}
- <Header onMenuClick={() => setIsMobileSidebarOpen(true)} />
- 
- <main className="flex-1 p-4 md:p-10 overflow-x-hidden">
- <div className="max-w-[1440px] mx-auto w-full">
- {children}
- </div>
- </main>
- </div>
- </div>
- );
+      {/* Mobile Sidebar (Drawer) */}
+      {user && (
+        <MobileSidebar
+          isOpen={isMobileSidebarOpen}
+          onClose={() => setIsMobileSidebarOpen(false)}
+        />
+      )}
+
+      <div className={`flex-1 flex flex-col min-w-0 ${user ? 'lg:pl-64' : ''}`}>
+        {/* Header tetap di atas - Ditambah prop onMenuClick */}
+        <Header onMenuClick={() => setIsMobileSidebarOpen(true)} />
+
+        <main className="flex-1 p-4 md:p-10 overflow-x-hidden">
+          <div className="max-w-[1440px] mx-auto w-full">
+            {children}
+          </div>
+        </main>
+      </div>
+    </div>
+  );
 }

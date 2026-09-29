@@ -54,7 +54,7 @@ export interface Badge {
   id: number;
   name: string;
   description: string;
-  badge_icon: string; // Nama file icon (rookie-badge.png)
+  badge_icon: string; 
   required_points: number;
   pivot?: {
     earned_at: string;
