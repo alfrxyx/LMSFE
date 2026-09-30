@@ -120,7 +120,7 @@ export function AdminSettings() {
                       <label className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest block ml-1">Platform Name</label>
                       <input 
                         type="text" 
-                        defaultValue="GamifyLearn" 
+                        defaultValue="PJKRLEARN" 
                         disabled 
                         className="w-full px-6 py-4 bg-gray-50 dark:bg-gray-800 border-2 border-transparent rounded-2xl text-gray-400 dark:text-gray-500 font-black italic cursor-not-allowed outline-none" 
                       />

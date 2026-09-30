@@ -163,7 +163,7 @@ export function Dashboard() {
           <div className="space-y-3">
             <h2 className="text-3xl font-black text-gray-900 dark:text-white uppercase tracking-tight">Selamat Datang!</h2>
             <p className="text-[10px] text-gray-500 dark:text-gray-400 font-bold uppercase tracking-widest leading-relaxed max-w-md mx-auto">
-              GamifyLearn LMS Universitas Negeri Malang
+              PJKRLEARN LMS Universitas Negeri Malang
             </p>
             <p className="text-sm text-gray-400 dark:text-gray-500 font-medium leading-relaxed max-w-md mx-auto mt-2">
               Anda belum bergabung dengan kelas praktikum manapun. Silakan masukkan Kode Kelas dari Dosen Anda di bawah ini untuk membuka akses materi kuliah dan memulai pembelajaran.
@@ -231,7 +231,7 @@ export function Dashboard() {
           <div className="relative z-10 space-y-4 max-w-[85%]">
             <h2 className="text-xl md:text-3xl font-black uppercase tracking-tight">Panel Pemantauan Dosen</h2>
             <p className="text-xs md:text-sm text-blue-100 max-w-xl">
-              Selamat datang di dashboard pengelolaan GamifyLearn. Di sini Anda dapat mengawasi kemajuan belajar mahasiswa, menilai tugas praktek, dan mengelola kelas praktikum Anda.
+              Selamat datang di dashboard pengelolaan PJKRLEARN. Di sini Anda dapat mengawasi kemajuan belajar mahasiswa, menilai tugas praktek, dan mengelola kelas praktikum Anda.
             </p>
             <div className="flex flex-wrap gap-3 pt-2">
               <Link 
