@@ -56,7 +56,7 @@ export function Login() {
             <div className="bg-blue-600 p-1.5 rounded-lg">
               <BookOpen className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-black text-gray-900 tracking-tighter">GamifyLearn</span>
+            <span className="text-xl font-black text-gray-900 tracking-tighter">PJKRLEARN</span>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 tracking-tight mb-2">
             Selamat Datang <span className="text-blue-600">Kembali.</span>
